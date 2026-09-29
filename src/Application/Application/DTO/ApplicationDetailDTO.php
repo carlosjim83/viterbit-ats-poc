@@ -17,7 +17,7 @@ final readonly class ApplicationDetailDTO
         public string $status,
         public string $appliedAt,
         public ?string $summary = null,
-        public ?float $score = null,
+        public ?int $score = null,
     ) {
     }
 }

@@ -38,8 +38,8 @@ final readonly class GetApplicationDetailHandler
             cvText: $application->cvText->value,
             status: $application->status->value,
             appliedAt: $application->appliedAt->format('Y-m-d H:i:s'),
-            summary: null,
-            score: null,
+            summary: $application->summary,
+            score: $application->score,
         );
     }
 }

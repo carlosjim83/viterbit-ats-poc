@@ -22,7 +22,7 @@ final class ApplicationDetailDTOTest extends TestCase
             status: 'received',
             appliedAt: '2025-09-29T13:00:00+00:00',
             summary: 'Strong candidate with extensive analytical experience.',
-            score: 92.5,
+            score: 92,
         );
 
         self::assertSame('app-123', $dto->id);
@@ -35,7 +35,7 @@ final class ApplicationDetailDTOTest extends TestCase
         self::assertSame('received', $dto->status);
         self::assertSame('2025-09-29T13:00:00+00:00', $dto->appliedAt);
         self::assertSame('Strong candidate with extensive analytical experience.', $dto->summary);
-        self::assertSame(92.5, $dto->score);
+        self::assertSame(92, $dto->score);
     }
 
     public function testSummaryAndScoreAreNullable(): void
