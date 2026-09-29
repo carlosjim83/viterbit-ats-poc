@@ -10,6 +10,8 @@ final class DummyTest extends TestCase
 {
     public function testPhpunitIsConfigured(): void
     {
-        self::assertTrue(true);
+        $value = false !== getenv('APP_ENV');
+
+        self::assertTrue($value);
     }
 }
