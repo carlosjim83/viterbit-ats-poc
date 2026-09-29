@@ -10,36 +10,25 @@ This is a technical test where quality, TDD rigour, and functional requirement c
 
 ## Decision
 
-After every significant implementation, **automated skills** (reviewable scripts/commands) will validate:
+After every significant implementation, **automated skills** (reviewable commands) validate quality using standard tools already configured in the project:
 
-1. **Hexagonal Architecture** (`validate-architecture`):
-   - Folder structure respected (Domain/Application/Infrastructure per context).
-   - No imports from Infrastructure into Domain or Application.
-   - Deptrac passes without errors.
+1. **Hexagonal Architecture**: `make deptrac` — verifies layer dependencies via Deptrac rules.
+2. **TDD and Tests**: `make test` — PHPUnit suite must pass at 100%; every class in `src/` must have a corresponding test in `tests/`.
+3. **Code Quality**: `make lint` — runs PHP-CS-Fixer + PHPStan + Deptrac; all must pass.
+4. **Functional Requirements**: `make test` must cover submission, filtering, and enrichment paths; manual code review checks endpoint/handler existence.
 
-2. **TDD and Coverage** (`validate-tdd`):
-   - Every class in `src/` has a corresponding test in `tests/`.
-   - PHPUnit passes at 100%.
-   - No dead code (unused classes).
+No custom validation scripts are used; the existing linting and testing toolchain is the single source of truth.
 
-3. **Code Quality** (`validate-quality`):
-   - PHP-CS-Fixer reports no errors.
-   - PHPStan at maximum level passes without errors.
-
-4. **Functional Requirements** (`validate-requirements`):
-   - Required endpoints/controllers exist (Apply, List, Detail).
-   - Handlers exist for key commands/queries.
-   - Mock LLM and async flow are implemented.
-
-Each skill is defined as an executable script (`bin/validate-*` or Make target) and documented in `.claude/skills/`.
+Each skill is documented as a Claude Code skill file in `.claude/skills/`.
 
 ## Consequences
 
 - **Positive**: Confidence that every commit maintains required quality.
-- **Positive**: The reviewer can run `make validate` and verify everything at once.
+- **Positive**: The reviewer can run `make validate` (lint + test) and verify everything at once.
+- **Positive**: No redundant scripts to maintain; tools already enforce the rules.
 - **Negative**: Additional time in each development cycle (acceptable for a quality PoC).
 
 ## References
 
 - `.claude/skills/`
-- `Makefile` (`validate-*` targets)
+- `Makefile` (`validate` target)
