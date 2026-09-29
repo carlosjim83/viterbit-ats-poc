@@ -16,7 +16,7 @@ final class ApplicationDetailControllerTest extends WebDatabaseTestCase
         $client->request('GET', '/applications/'.$application->id);
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('h1', 'Application Detail');
+        self::assertSelectorTextContains('h1', 'Ada Lovelace');
 
         $html = (string) $client->getResponse()->getContent();
         self::assertStringContainsString('Ada Lovelace', $html);
