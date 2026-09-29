@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Application Detail{% endblock %}
+
+{% block body %}
+<div class="max-w-2xl mx-auto p-6">
+    <h1 class="text-2xl font-bold mb-6">Application Detail</h1>
+
+    <table class="w-full border-collapse border border-gray-300">
+        <tbody>
+            <tr class="hover:bg-gray-50">
+                <th class="border border-gray-300 px-4 py-2 text-left bg-gray-100">ID</th>
+                <td class="border border-gray-300 px-4 py-2">{{ application.id }}</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+                <th class="border border-gray-300 px-4 py-2 text-left bg-gray-100">Full Name</th>
+                <td class="border border-gray-300 px-4 py-2">{{ application.fullName }}</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+                <th class="border border-gray-300 px-4 py-2 text-left bg-gray-100">Email</th>
+                <td class="border border-gray-300 px-4 py-2">{{ application.email }}</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+                <th class="border border-gray-300 px-4 py-2 text-left bg-gray-100">Phone</th>
+                <td class="border border-gray-300 px-4 py-2">{{ application.phone }}</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+                <th class="border border-gray-300 px-4 py-2 text-left bg-gray-100">Position</th>
+                <td class="border border-gray-300 px-4 py-2">{{ application.position }}</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+                <th class="border border-gray-300 px-4 py-2 text-left bg-gray-100">Notes</th>
+                <td class="border border-gray-300 px-4 py-2">{{ application.notes }}</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+                <th class="border border-gray-300 px-4 py-2 text-left bg-gray-100">CV Text</th>
+                <td class="border border-gray-300 px-4 py-2">{{ application.cvText }}</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+                <th class="border border-gray-300 px-4 py-2 text-left bg-gray-100">Status</th>
+                <td class="border border-gray-300 px-4 py-2">{{ application.status|capitalize }}</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+                <th class="border border-gray-300 px-4 py-2 text-left bg-gray-100">Applied At</th>
+                <td class="border border-gray-300 px-4 py-2">{{ application.appliedAt|date('Y-m-d H:i') }}</td>
+            </tr>
+            {% if application.summary %}
+                <tr class="hover:bg-gray-50">
+                    <th class="border border-gray-300 px-4 py-2 text-left bg-gray-100">Summary</th>
+                    <td class="border border-gray-300 px-4 py-2">{{ application.summary }}</td>
+                </tr>
+            {% endif %}
+            {% if application.score is not null %}
+                <tr class="hover:bg-gray-50">
+                    <th class="border border-gray-300 px-4 py-2 text-left bg-gray-100">Score</th>
+                    <td class="border border-gray-300 px-4 py-2">{{ application.score }}</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+    <div class="mt-6">
+        <a href="{{ path('applications_list') }}" class="text-blue-600 hover:underline">← Back to list</a>
+    </div>
+</div>
+{% endblock %}
