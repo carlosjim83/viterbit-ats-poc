@@ -1,10 +1,10 @@
-<div {{ attributes }} class="max-w-6xl mx-auto p-6" data-controller="application-list">
+<div {{ attributes.defaults(stimulus_controller('application-list')) }} class="max-w-6xl mx-auto p-6 transition-opacity duration-150">
     <h1 class="text-2xl font-bold mb-6">Job Applications</h1>
 
     <form class="mb-6 flex gap-4 flex-wrap items-end" data-action="submit->prevent">
         <div>
             <label for="status" class="block text-sm font-medium mb-1">Status</label>
-            <select name="status" id="status" data-model="status" data-action="change->application-list#filter" class="border rounded px-3 py-2">
+            <select name="status" id="status" data-model="status" class="border rounded px-3 py-2">
                 <option value="" {% if status == '' %}selected{% endif %}>All</option>
                 <option value="received" {% if status == 'received' %}selected{% endif %}>Received</option>
                 <option value="enriching" {% if status == 'enriching' %}selected{% endif %}>Enriching</option>
@@ -14,15 +14,15 @@
 
         <div>
             <label for="position" class="block text-sm font-medium mb-1">Position</label>
-            <input type="text" name="position" id="position" data-model="position" data-action="input->application-list#filter" value="{{ position }}" placeholder="Any position" class="border rounded px-3 py-2">
+            <input type="text" name="position" id="position" data-model="position" value="{{ position }}" placeholder="Any position" class="border rounded px-3 py-2">
         </div>
 
         <div>
             <label for="search" class="block text-sm font-medium mb-1">Search</label>
-            <input type="text" name="search" id="search" data-model="search" data-action="input->application-list#filter" value="{{ search }}" placeholder="Name or email" class="border rounded px-3 py-2">
+            <input type="text" name="search" id="search" data-model="search" value="{{ search }}" placeholder="Name or email" class="border rounded px-3 py-2">
         </div>
 
-        <button type="button" data-action="click->application-list#clear" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm">
+        <button type="button" data-action="click->live#action" data-live-action-param="clear" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm">
             Clear
         </button>
     </form>
@@ -33,21 +33,31 @@
         <table class="w-full border-collapse border border-gray-300">
             <thead>
                 <tr class="bg-gray-100">
-                    <th class="border border-gray-300 px-4 py-2 text-left cursor-pointer hover:bg-gray-200" data-action="click->application-list#sort" data-application-list-column-param="fullName">
-                        Name <span class="text-gray-400">↕</span>
+                    <th class="border border-gray-300 px-4 py-2 text-left cursor-pointer hover:bg-gray-200"
+                        data-action="click->live#action" data-live-action-param="sort" data-live-column-param="fullName"
+                    >
+                        Name {% if sortBy == 'fullName' %}{{ sortDir == 'asc' ? '↑' : '↓' }}{% else %}↕{% endif %}
                     </th>
                     <th class="border border-gray-300 px-4 py-2 text-left">Email</th>
-                    <th class="border border-gray-300 px-4 py-2 text-left cursor-pointer hover:bg-gray-200" data-action="click->application-list#sort" data-application-list-column-param="position">
-                        Position <span class="text-gray-400">↕</span>
+                    <th class="border border-gray-300 px-4 py-2 text-left cursor-pointer hover:bg-gray-200"
+                        data-action="click->live#action" data-live-action-param="sort" data-live-column-param="position"
+                    >
+                        Position {% if sortBy == 'position' %}{{ sortDir == 'asc' ? '↑' : '↓' }}{% else %}↕{% endif %}
                     </th>
-                    <th class="border border-gray-300 px-4 py-2 text-left cursor-pointer hover:bg-gray-200" data-action="click->application-list#sort" data-application-list-column-param="status">
-                        Status <span class="text-gray-400">↕</span>
+                    <th class="border border-gray-300 px-4 py-2 text-left cursor-pointer hover:bg-gray-200"
+                        data-action="click->live#action" data-live-action-param="sort" data-live-column-param="status"
+                    >
+                        Status {% if sortBy == 'status' %}{{ sortDir == 'asc' ? '↑' : '↓' }}{% else %}↕{% endif %}
                     </th>
-                    <th class="border border-gray-300 px-4 py-2 text-left cursor-pointer hover:bg-gray-200" data-action="click->application-list#sort" data-application-list-column-param="score">
-                        Score <span class="text-gray-400">↕</span>
+                    <th class="border border-gray-300 px-4 py-2 text-left cursor-pointer hover:bg-gray-200"
+                        data-action="click->live#action" data-live-action-param="sort" data-live-column-param="score"
+                    >
+                        Score {% if sortBy == 'score' %}{{ sortDir == 'asc' ? '↑' : '↓' }}{% else %}↕{% endif %}
                     </th>
-                    <th class="border border-gray-300 px-4 py-2 text-left cursor-pointer hover:bg-gray-200" data-action="click->application-list#sort" data-application-list-column-param="appliedAt">
-                        Applied At <span class="text-gray-400">↕</span>
+                    <th class="border border-gray-300 px-4 py-2 text-left cursor-pointer hover:bg-gray-200"
+                        data-action="click->live#action" data-live-action-param="sort" data-live-column-param="appliedAt"
+                    >
+                        Applied At {% if sortBy == 'appliedAt' %}{{ sortDir == 'asc' ? '↑' : '↓' }}{% else %}↕{% endif %}
                     </th>
                 </tr>
             </thead>
