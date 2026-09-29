@@ -5,8 +5,7 @@ framework:
 
         transports:
             # https://symfony.com/doc/current/messenger.html#transport-configuration
-            # async: '%env(MESSENGER_TRANSPORT_DSN)%'
-            # failed: 'doctrine://default?queue_name=failed'
+            enrichment: 'doctrine://default?queue_name=enrichment'
             sync: 'sync://'
 
         routing:

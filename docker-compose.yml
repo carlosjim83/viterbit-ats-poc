@@ -57,7 +57,7 @@ services:
       - DATABASE_URL=postgresql://viterbit:viterbit@db:5432/viterbit?serverVersion=16&charset=utf8
     depends_on:
       - db
-    command: ["php", "bin/console", "messenger:consume", "async", "-vv"]
+    command: ["php", "bin/console", "ecotone:run", "enrichment", "-vv"]
 
 volumes:
   pgdata:

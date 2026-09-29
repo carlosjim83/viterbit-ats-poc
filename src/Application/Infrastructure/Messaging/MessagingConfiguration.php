@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace App\Application\Infrastructure\Messaging;
 
 use Ecotone\Messaging\Attribute\ServiceContext;
-use Ecotone\Messaging\Channel\SimpleMessageChannelBuilder;
+use Ecotone\Messaging\Channel\MessageChannelBuilder;
+use Ecotone\SymfonyBundle\Messenger\SymfonyMessengerMessageChannelBuilder;
 
 final class MessagingConfiguration
 {
     #[ServiceContext]
-    public function enrichmentChannel(): SimpleMessageChannelBuilder
+    public function enrichmentChannel(): MessageChannelBuilder
     {
-        return SimpleMessageChannelBuilder::createQueueChannel('enrichment');
+        return SymfonyMessengerMessageChannelBuilder::create('enrichment');
     }
 }
