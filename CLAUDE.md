@@ -95,17 +95,19 @@ make lint          # Run all linting tools
 make test          # Run full PHPUnit suite
 make test-unit     # Run only unit tests
 make test-integration  # Run only integration tests
+make validate      # Run lint + test (all quality gates)
 ```
 
 ### Symfony
 ```bash
-symfony server:start   # Start local dev server
-symfony console ...    # Run Symfony console commands
+make up            # Start Docker services
+make down          # Stop Docker services
+make sh            # Open shell in PHP container
 ```
 
 ## Linting & Quality Gates
 
-PHP-CS-Fixer, PHPStan, and Deptrac must be configured from minute zero and must pass before any commit.
+PHP-CS-Fixer, PHPStan, and Deptrac must be configured from minute zero and must pass before any commit. No custom validation scripts are used; the existing linting and testing toolchain is the single source of truth.
 
 ## ADRs
 
