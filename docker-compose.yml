@@ -59,7 +59,8 @@ services:
       - DATABASE_URL=postgresql://viterbit:viterbit@db:5432/viterbit?serverVersion=16&charset=utf8
     depends_on:
       - db
-    command: ["php", "bin/console", "ecotone:run", "enrichment", "--memoryLimit=100", "-vv"]
+    restart: unless-stopped
+    command: ["php", "bin/console", "ecotone:run", "enrichment", "-vv"]
 
 volumes:
   pgdata:
