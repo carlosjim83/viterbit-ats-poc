@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Application\Domain\Model;
+namespace App\Shared\Domain\Model;
 
 trait WithEvents
 {

@@ -13,6 +13,7 @@ use App\Application\Domain\Model\ValueObject\Notes;
 use App\Application\Domain\Model\ValueObject\Phone;
 use App\Application\Domain\Model\ValueObject\Position;
 use App\Application\Domain\Model\ValueObject\Status;
+use App\Shared\Domain\Model\WithEvents;
 
 final class JobApplication
 {

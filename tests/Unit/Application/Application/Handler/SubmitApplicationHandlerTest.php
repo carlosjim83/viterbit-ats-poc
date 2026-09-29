@@ -6,12 +6,12 @@ namespace App\Tests\Unit\Application\Application\Handler;
 
 use App\Application\Application\Command\SubmitApplication\SubmitApplication;
 use App\Application\Application\Command\SubmitApplication\SubmitApplicationHandler;
-use App\Application\Application\EventBus;
 use App\Application\Domain\Event\ApplicationSubmitted;
 use App\Application\Domain\Event\EnrichmentRequested;
 use App\Application\Domain\Model\JobApplication;
 use App\Application\Domain\Model\ValueObject\ApplicationId;
 use App\Application\Domain\Repository\JobApplicationRepository;
+use App\Shared\Domain\EventBus;
 use PHPUnit\Framework\TestCase;
 
 final class SubmitApplicationHandlerTest extends TestCase

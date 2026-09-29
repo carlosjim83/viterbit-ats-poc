@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Application\Application\Command\SubmitApplication;
 
-use App\Application\Application\EventBus;
 use App\Application\Domain\Event\EnrichmentRequested;
 use App\Application\Domain\Model\JobApplication;
 use App\Application\Domain\Model\ValueObject\ApplicationId;
@@ -15,6 +14,7 @@ use App\Application\Domain\Model\ValueObject\Notes;
 use App\Application\Domain\Model\ValueObject\Phone;
 use App\Application\Domain\Model\ValueObject\Position;
 use App\Application\Domain\Repository\JobApplicationRepository;
+use App\Shared\Domain\EventBus;
 use Ecotone\Modelling\Attribute\CommandHandler;
 
 final readonly class SubmitApplicationHandler

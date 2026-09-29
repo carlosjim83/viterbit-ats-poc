@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Infrastructure\Messaging;
 
-use App\Application\Application\EventBus;
+use App\Shared\Domain\EventBus;
 use Ecotone\Modelling\EventBus as EcotoneEventBusInterface;
 
 final readonly class EcotoneEventBus implements EventBus

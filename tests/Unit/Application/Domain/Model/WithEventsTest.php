@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Domain\Model;
 
-use App\Application\Domain\Model\WithEvents;
+use App\Shared\Domain\Model\WithEvents;
 use PHPUnit\Framework\TestCase;
 
 final class WithEventsTest extends TestCase
