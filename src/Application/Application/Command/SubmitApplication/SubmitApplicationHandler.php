@@ -28,9 +28,15 @@ final readonly class SubmitApplicationHandler
     #[CommandHandler('application.submit')]
     public function handle(SubmitApplication $command): ApplicationId
     {
+        $email = new Email($command->email);
+
+        if (null !== $this->repository->findByEmail($email)) {
+            throw new \DomainException('An application with this email already exists.');
+        }
+
         $application = JobApplication::submit(
             new FullName($command->fullName),
-            new Email($command->email),
+            $email,
             new Phone($command->phone),
             new Position($command->position),
             new Notes($command->notes),

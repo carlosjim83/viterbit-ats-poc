@@ -169,6 +169,17 @@ final class InMemoryJobApplicationRepository implements JobApplicationRepository
         return $apps;
     }
 
+    public function findByEmail(\App\Application\Domain\Model\ValueObject\Email $email): ?JobApplication
+    {
+        foreach ($this->applications as $application) {
+            if ($application->email->value === $email->value) {
+                return $application;
+            }
+        }
+
+        return null;
+    }
+
     public function findByCriteria(array $criteria): array
     {
         $apps = $this->findAll();

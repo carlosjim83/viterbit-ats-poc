@@ -10,6 +10,7 @@ use App\Application\Domain\Event\ApplicationSubmitted;
 use App\Application\Domain\Event\EnrichmentRequested;
 use App\Application\Domain\Model\JobApplication;
 use App\Application\Domain\Model\ValueObject\ApplicationId;
+use App\Application\Domain\Model\ValueObject\Email;
 use App\Application\Domain\Repository\JobApplicationRepository;
 use App\Shared\Domain\EventBus;
 use PHPUnit\Framework\TestCase;
@@ -20,6 +21,8 @@ final class SubmitApplicationHandlerTest extends TestCase
     {
         $repository = $this->createMock(JobApplicationRepository::class);
         $eventBus = $this->createMock(EventBus::class);
+
+        $repository->method('findByEmail')->willReturn(null);
 
         $repository->expects(self::once())
             ->method('save')
@@ -57,5 +60,40 @@ final class SubmitApplicationHandlerTest extends TestCase
         self::assertInstanceOf(ApplicationSubmitted::class, $publishedEvents[0]);
         self::assertInstanceOf(EnrichmentRequested::class, $publishedEvents[1]);
         self::assertTrue($id->equals($publishedEvents[1]->applicationId));
+    }
+
+    public function testHandleRejectsDuplicateEmail(): void
+    {
+        $existing = JobApplication::submit(
+            new \App\Application\Domain\Model\ValueObject\FullName('Existing'),
+            new Email('duplicate@example.com'),
+            new \App\Application\Domain\Model\ValueObject\Phone('+1111111111'),
+            new \App\Application\Domain\Model\ValueObject\Position('Dev'),
+            new \App\Application\Domain\Model\ValueObject\Notes(''),
+            new \App\Application\Domain\Model\ValueObject\CVText('Existing CV'),
+        );
+
+        $repository = $this->createMock(JobApplicationRepository::class);
+        $repository->method('findByEmail')
+            ->with(self::callback(static fn (Email $email): bool => 'duplicate@example.com' === $email->value))
+            ->willReturn($existing);
+
+        $eventBus = $this->createMock(EventBus::class);
+        $eventBus->expects(self::never())->method('publish');
+
+        $handler = new SubmitApplicationHandler($repository, $eventBus);
+        $command = new SubmitApplication(
+            'Test User',
+            'duplicate@example.com',
+            '+1234567890',
+            'Developer',
+            'Some notes',
+            'Some CV text',
+        );
+
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage('An application with this email already exists.');
+
+        $handler->handle($command);
     }
 }

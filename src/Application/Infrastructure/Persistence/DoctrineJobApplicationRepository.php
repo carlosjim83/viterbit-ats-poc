@@ -70,6 +70,18 @@ final readonly class DoctrineJobApplicationRepository implements JobApplicationR
         return $this->toAggregate($entity);
     }
 
+    public function findByEmail(Email $email): ?JobApplication
+    {
+        $entity = $this->entityManager->getRepository(DoctrineJobApplication::class)
+            ->findOneBy(['email' => $email->value]);
+
+        if (null === $entity) {
+            return null;
+        }
+
+        return $this->toAggregate($entity);
+    }
+
     public function findAll(): array
     {
         $entities = $this->entityManager->getRepository(DoctrineJobApplication::class)

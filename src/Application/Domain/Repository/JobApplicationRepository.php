@@ -16,6 +16,8 @@ interface JobApplicationRepository
     /** @return list<JobApplication> */
     public function findAll(): array;
 
+    public function findByEmail(\App\Application\Domain\Model\ValueObject\Email $email): ?JobApplication;
+
     /**
      * @param array{status?: string, position?: string, search?: string} $criteria
      *
