@@ -28,7 +28,7 @@ final class JobApplicationMother
 
     public static function create(): JobApplication
     {
-        return self::builder()->create();
+        return self::builder()->build();
     }
 
     public function withName(string $name): self
