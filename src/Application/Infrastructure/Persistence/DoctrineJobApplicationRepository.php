@@ -95,8 +95,8 @@ final readonly class DoctrineJobApplicationRepository implements JobApplicationR
         }
 
         if (isset($criteria['position']) && '' !== $criteria['position']) {
-            $qb->andWhere('ja.position = :position')
-                ->setParameter('position', $criteria['position']);
+            $qb->andWhere('LOWER(ja.position) LIKE LOWER(:position)')
+                ->setParameter('position', '%'.$criteria['position'].'%');
         }
 
         if (isset($criteria['search']) && '' !== $criteria['search']) {
