@@ -31,5 +31,6 @@
     <php>
         <env name="APP_ENV" value="test" force="true" />
         <env name="KERNEL_CLASS" value="App\Kernel" />
+        <env name="DEFAULT_URI" value="http://localhost" />
     </php>
 </phpunit>
