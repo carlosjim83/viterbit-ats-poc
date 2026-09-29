@@ -9,6 +9,8 @@ use App\Application\Domain\Model\ValueObject\ApplicationId;
 use App\Application\Domain\Model\ValueObject\CVText;
 use App\Application\Domain\Model\ValueObject\Email;
 use App\Application\Domain\Model\ValueObject\FullName;
+use App\Application\Domain\Model\ValueObject\Notes;
+use App\Application\Domain\Model\ValueObject\Phone;
 use App\Application\Domain\Model\ValueObject\Position;
 use App\Application\Domain\Model\ValueObject\Status;
 
@@ -21,7 +23,9 @@ final class JobApplication
         public readonly ApplicationId $id,
         public readonly FullName $fullName,
         public readonly Email $email,
+        public readonly Phone $phone,
         public readonly Position $position,
+        public readonly Notes $notes,
         public readonly CVText $cvText,
         public readonly Status $status,
         public readonly \DateTimeImmutable $appliedAt,
@@ -31,14 +35,16 @@ final class JobApplication
     public static function submit(
         FullName $fullName,
         Email $email,
+        Phone $phone,
         Position $position,
+        Notes $notes,
         CVText $cvText,
     ): self {
         $id = ApplicationId::generate();
         $status = Status::received();
         $appliedAt = new \DateTimeImmutable();
 
-        $application = new self($id, $fullName, $email, $position, $cvText, $status, $appliedAt);
+        $application = new self($id, $fullName, $email, $phone, $position, $notes, $cvText, $status, $appliedAt);
         $application->recordEvent(new ApplicationSubmitted($id, $appliedAt));
 
         return $application;

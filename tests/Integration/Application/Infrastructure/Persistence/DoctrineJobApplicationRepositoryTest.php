@@ -8,6 +8,8 @@ use App\Application\Domain\Model\JobApplication;
 use App\Application\Domain\Model\ValueObject\CVText;
 use App\Application\Domain\Model\ValueObject\Email;
 use App\Application\Domain\Model\ValueObject\FullName;
+use App\Application\Domain\Model\ValueObject\Notes;
+use App\Application\Domain\Model\ValueObject\Phone;
 use App\Application\Domain\Model\ValueObject\Position;
 use App\Application\Infrastructure\Persistence\DoctrineJobApplicationRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -70,7 +72,9 @@ final class DoctrineJobApplicationRepositoryTest extends KernelTestCase
         return JobApplication::submit(
             new FullName('Test User'),
             new Email('test@example.com'),
+            new Phone('+1234567890'),
             new Position('Developer'),
+            new Notes(''),
             new CVText('Some experience'),
         );
     }

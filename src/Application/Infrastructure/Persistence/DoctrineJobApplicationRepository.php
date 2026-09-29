@@ -9,6 +9,8 @@ use App\Application\Domain\Model\ValueObject\ApplicationId;
 use App\Application\Domain\Model\ValueObject\CVText;
 use App\Application\Domain\Model\ValueObject\Email;
 use App\Application\Domain\Model\ValueObject\FullName;
+use App\Application\Domain\Model\ValueObject\Notes;
+use App\Application\Domain\Model\ValueObject\Phone;
 use App\Application\Domain\Model\ValueObject\Position;
 use App\Application\Domain\Model\ValueObject\Status;
 use App\Application\Domain\Repository\JobApplicationRepository;
@@ -31,7 +33,9 @@ final readonly class DoctrineJobApplicationRepository implements JobApplicationR
         if (null !== $entity) {
             $entity->setFullName($application->fullName->value);
             $entity->setEmail($application->email->value);
+            $entity->setPhone($application->phone->value);
             $entity->setPosition($application->position->value);
+            $entity->setNotes($application->notes->value);
             $entity->setCvText($application->cvText->value);
             $entity->setStatus($application->status->value);
             $entity->setAppliedAt($application->appliedAt);
@@ -40,7 +44,9 @@ final readonly class DoctrineJobApplicationRepository implements JobApplicationR
                 (string) $application->id,
                 $application->fullName->value,
                 $application->email->value,
+                $application->phone->value,
                 $application->position->value,
+                $application->notes->value,
                 $application->cvText->value,
                 $application->status->value,
                 $application->appliedAt,
@@ -92,9 +98,17 @@ final readonly class DoctrineJobApplicationRepository implements JobApplicationR
         $emailProp->setAccessible(true);
         $emailProp->setValue($instance, new Email($entity->getEmail()));
 
+        $phoneProp = $reflection->getProperty('phone');
+        $phoneProp->setAccessible(true);
+        $phoneProp->setValue($instance, new Phone($entity->getPhone()));
+
         $positionProp = $reflection->getProperty('position');
         $positionProp->setAccessible(true);
         $positionProp->setValue($instance, new Position($entity->getPosition()));
+
+        $notesProp = $reflection->getProperty('notes');
+        $notesProp->setAccessible(true);
+        $notesProp->setValue($instance, new Notes($entity->getNotes() ?? ''));
 
         $cvTextProp = $reflection->getProperty('cvText');
         $cvTextProp->setAccessible(true);

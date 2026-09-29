@@ -37,7 +37,9 @@ final class SubmitApplicationHandlerTest extends KernelTestCase
         $command = new SubmitApplication(
             'Jane Doe',
             'jane@example.com',
+            '+1234567890',
             'Product Manager',
+            'Looking for remote work',
             '10 years of experience',
         );
 
@@ -54,7 +56,9 @@ final class SubmitApplicationHandlerTest extends KernelTestCase
         self::assertNotFalse($row);
         self::assertSame('Jane Doe', $row['full_name']);
         self::assertSame('jane@example.com', $row['email']);
+        self::assertSame('+1234567890', $row['phone']);
         self::assertSame('Product Manager', $row['position']);
+        self::assertSame('Looking for remote work', $row['notes']);
         self::assertSame('10 years of experience', $row['cv_text']);
         self::assertSame('received', $row['status']);
     }

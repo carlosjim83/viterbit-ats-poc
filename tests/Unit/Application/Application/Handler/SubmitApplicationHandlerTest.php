@@ -25,7 +25,9 @@ final class SubmitApplicationHandlerTest extends TestCase
             ->with(self::callback(static function (JobApplication $app): bool {
                 return 'Test User' === $app->fullName->value
                     && 'test@example.com' === $app->email->value
+                    && '+1234567890' === $app->phone->value
                     && 'Developer' === $app->position->value
+                    && 'Some notes' === $app->notes->value
                     && 'Some CV text' === $app->cvText->value
                     && 'received' === $app->status->value;
             }));
@@ -40,7 +42,9 @@ final class SubmitApplicationHandlerTest extends TestCase
         $command = new SubmitApplication(
             'Test User',
             'test@example.com',
+            '+1234567890',
             'Developer',
+            'Some notes',
             'Some CV text',
         );
 

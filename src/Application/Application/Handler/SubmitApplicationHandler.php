@@ -11,6 +11,8 @@ use App\Application\Domain\Model\ValueObject\ApplicationId;
 use App\Application\Domain\Model\ValueObject\CVText;
 use App\Application\Domain\Model\ValueObject\Email;
 use App\Application\Domain\Model\ValueObject\FullName;
+use App\Application\Domain\Model\ValueObject\Notes;
+use App\Application\Domain\Model\ValueObject\Phone;
 use App\Application\Domain\Model\ValueObject\Position;
 use App\Application\Domain\Repository\JobApplicationRepository;
 use Ecotone\Modelling\Attribute\CommandHandler;
@@ -29,7 +31,9 @@ final readonly class SubmitApplicationHandler
         $application = JobApplication::submit(
             new FullName($command->fullName),
             new Email($command->email),
+            new Phone($command->phone),
             new Position($command->position),
+            new Notes($command->notes),
             new CVText($command->cvText),
         );
 

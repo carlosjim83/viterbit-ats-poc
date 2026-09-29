@@ -21,8 +21,14 @@ final class DoctrineJobApplication
     #[ORM\Column(type: Types::STRING, length: 255)]
     private string $email;
 
+    #[ORM\Column(type: Types::STRING, length: 50)]
+    private string $phone;
+
     #[ORM\Column(type: Types::STRING, length: 255)]
     private string $position;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $notes;
 
     #[ORM\Column(type: Types::TEXT)]
     private string $cvText;
@@ -37,7 +43,9 @@ final class DoctrineJobApplication
         string $id,
         string $fullName,
         string $email,
+        string $phone,
         string $position,
+        ?string $notes,
         string $cvText,
         string $status,
         \DateTimeImmutable $appliedAt,
@@ -45,7 +53,9 @@ final class DoctrineJobApplication
         $this->id = $id;
         $this->fullName = $fullName;
         $this->email = $email;
+        $this->phone = $phone;
         $this->position = $position;
+        $this->notes = $notes;
         $this->cvText = $cvText;
         $this->status = $status;
         $this->appliedAt = $appliedAt;
@@ -76,6 +86,16 @@ final class DoctrineJobApplication
         $this->email = $email;
     }
 
+    public function getPhone(): string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(string $phone): void
+    {
+        $this->phone = $phone;
+    }
+
     public function getPosition(): string
     {
         return $this->position;
@@ -84,6 +104,16 @@ final class DoctrineJobApplication
     public function setPosition(string $position): void
     {
         $this->position = $position;
+    }
+
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
+
+    public function setNotes(?string $notes): void
+    {
+        $this->notes = $notes;
     }
 
     public function getCvText(): string
