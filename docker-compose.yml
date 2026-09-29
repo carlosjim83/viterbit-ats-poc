@@ -7,6 +7,7 @@ services:
     working_dir: /app
     volumes:
       - .:/app:cached
+      - ./docker/php/conf.d/memory-limit.ini:/usr/local/etc/php/conf.d/memory-limit.ini:ro
     networks:
       - viterbit
     environment:
@@ -50,6 +51,7 @@ services:
     working_dir: /app
     volumes:
       - .:/app:cached
+      - ./docker/php/conf.d/memory-limit.ini:/usr/local/etc/php/conf.d/memory-limit.ini:ro
     networks:
       - viterbit
     environment:
@@ -57,7 +59,7 @@ services:
       - DATABASE_URL=postgresql://viterbit:viterbit@db:5432/viterbit?serverVersion=16&charset=utf8
     depends_on:
       - db
-    command: ["php", "bin/console", "ecotone:run", "enrichment", "-vv"]
+    command: ["php", "bin/console", "ecotone:run", "enrichment", "--memoryLimit=100", "-vv"]
 
 volumes:
   pgdata:
