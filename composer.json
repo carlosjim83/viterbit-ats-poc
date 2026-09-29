@@ -26,10 +26,10 @@
         "twig/twig": "^2.12|^3.0"
     },
     "require-dev": {
+        "deptrac/deptrac": "^4.2",
         "friendsofphp/php-cs-fixer": "^3.0",
         "phpstan/phpstan": "^1.10",
-        "phpunit/phpunit": "^10.0",
-        "qossmic/deptrac": "*"
+        "phpunit/phpunit": "^10.0"
     },
     "config": {
         "allow-plugins": {
