@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace App\Application\Application\Handler;
+namespace App\Application\Application\Command\SubmitApplication;
 
-use App\Application\Application\Command\SubmitApplication;
 use App\Application\Application\EventBus;
 use App\Application\Domain\Event\EnrichmentRequested;
 use App\Application\Domain\Model\JobApplication;

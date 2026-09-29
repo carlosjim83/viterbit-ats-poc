@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Application\Application\Query;
+namespace App\Application\Application\Query\ListApplications;
 
 final readonly class ListApplications
 {

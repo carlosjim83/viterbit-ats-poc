@@ -2,10 +2,8 @@
 
 declare(strict_types=1);
 
-namespace App\Application\Application\Handler;
+namespace App\Application\Application\Query\GetApplicationDetail;
 
-use App\Application\Application\DTO\ApplicationDetailDTO;
-use App\Application\Application\Query\GetApplicationDetail;
 use App\Application\Domain\Model\ValueObject\ApplicationId;
 use App\Application\Domain\Repository\JobApplicationRepository;
 use Ecotone\Modelling\Attribute\QueryHandler;

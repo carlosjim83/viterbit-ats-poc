@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Application\Application\Handler;
 
-use App\Application\Application\Handler\GetApplicationDetailHandler;
-use App\Application\Application\Query\GetApplicationDetail;
+use App\Application\Application\Query\GetApplicationDetail\GetApplicationDetail;
+use App\Application\Application\Query\GetApplicationDetail\GetApplicationDetailHandler;
 use App\Tests\DatabaseTestCase;
 
 final class GetApplicationDetailHandlerTest extends DatabaseTestCase

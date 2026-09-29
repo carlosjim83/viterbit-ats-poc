@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Infrastructure\Web;
 
-use App\Application\Application\Query\GetApplicationDetail;
+use App\Application\Application\Query\GetApplicationDetail\GetApplicationDetail;
 use Ecotone\Modelling\QueryBus;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Application\DTO;
 
-use App\Application\Application\DTO\ApplicationDetailDTO;
+use App\Application\Application\Query\GetApplicationDetail\ApplicationDetailDTO;
 use PHPUnit\Framework\TestCase;
 
 final class ApplicationDetailDTOTest extends TestCase

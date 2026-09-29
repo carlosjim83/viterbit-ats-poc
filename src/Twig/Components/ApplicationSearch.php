@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Twig\Components;
 
-use App\Application\Application\Query\ListApplications;
+use App\Application\Application\Query\ListApplications\ListApplications;
 use Ecotone\Modelling\QueryBus;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;

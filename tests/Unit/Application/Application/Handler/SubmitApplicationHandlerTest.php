@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Application\Handler;
 
-use App\Application\Application\Command\SubmitApplication;
+use App\Application\Application\Command\SubmitApplication\SubmitApplication;
+use App\Application\Application\Command\SubmitApplication\SubmitApplicationHandler;
 use App\Application\Application\EventBus;
-use App\Application\Application\Handler\SubmitApplicationHandler;
 use App\Application\Domain\Event\ApplicationSubmitted;
 use App\Application\Domain\Event\EnrichmentRequested;
 use App\Application\Domain\Model\JobApplication;

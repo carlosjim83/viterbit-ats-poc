@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Application\Handler;
 
-use App\Application\Application\DTO\ApplicationDTO;
-use App\Application\Application\Handler\ListApplicationsHandler;
-use App\Application\Application\Query\ListApplications;
+use App\Application\Application\Query\ListApplications\ApplicationDTO;
+use App\Application\Application\Query\ListApplications\ListApplications;
+use App\Application\Application\Query\ListApplications\ListApplicationsHandler;
 use App\Application\Domain\Repository\JobApplicationRepository;
 use App\Tests\Helpers\Mother\JobApplicationMother;
 use PHPUnit\Framework\TestCase;

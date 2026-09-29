@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Application\Handler;
 
-use App\Application\Application\DTO\ApplicationDetailDTO;
-use App\Application\Application\Handler\GetApplicationDetailHandler;
-use App\Application\Application\Query\GetApplicationDetail;
+use App\Application\Application\Query\GetApplicationDetail\ApplicationDetailDTO;
+use App\Application\Application\Query\GetApplicationDetail\GetApplicationDetail;
+use App\Application\Application\Query\GetApplicationDetail\GetApplicationDetailHandler;
 use App\Application\Domain\Model\ValueObject\ApplicationId;
 use App\Application\Domain\Repository\JobApplicationRepository;
 use App\Tests\Helpers\Mother\JobApplicationMother;

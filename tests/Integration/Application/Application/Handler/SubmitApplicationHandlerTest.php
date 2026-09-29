@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Application\Application\Handler;
 
-use App\Application\Application\Command\SubmitApplication;
+use App\Application\Application\Command\SubmitApplication\SubmitApplication;
 use App\Application\Domain\Model\ValueObject\ApplicationId;
 use Doctrine\ORM\EntityManagerInterface;
 use Ecotone\Modelling\CommandBus;

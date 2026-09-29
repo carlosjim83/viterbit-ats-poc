@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Application\Application\Handler;
 
-use App\Application\Application\Handler\ListApplicationsHandler;
-use App\Application\Application\Query\ListApplications;
+use App\Application\Application\Query\ListApplications\ListApplications;
+use App\Application\Application\Query\ListApplications\ListApplicationsHandler;
 use App\Tests\DatabaseTestCase;
 
 final class ListApplicationsHandlerTest extends DatabaseTestCase

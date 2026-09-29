@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Infrastructure\Web;
 
-use App\Application\Application\Command\SubmitApplication;
+use App\Application\Application\Command\SubmitApplication\SubmitApplication;
 use Ecotone\Modelling\CommandBus;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
