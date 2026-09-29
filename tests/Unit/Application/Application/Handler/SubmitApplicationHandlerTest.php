@@ -8,6 +8,7 @@ use App\Application\Application\Command\SubmitApplication;
 use App\Application\Application\EventBus;
 use App\Application\Application\Handler\SubmitApplicationHandler;
 use App\Application\Domain\Event\ApplicationSubmitted;
+use App\Application\Domain\Event\EnrichmentRequested;
 use App\Application\Domain\Model\JobApplication;
 use App\Application\Domain\Model\ValueObject\ApplicationId;
 use App\Application\Domain\Repository\JobApplicationRepository;
@@ -32,11 +33,12 @@ final class SubmitApplicationHandlerTest extends TestCase
                     && 'received' === $app->status->value;
             }));
 
-        $eventBus->expects(self::once())
+        $publishedEvents = [];
+        $eventBus->expects(self::exactly(2))
             ->method('publish')
-            ->with(self::callback(static function ($event): bool {
-                return $event instanceof ApplicationSubmitted;
-            }));
+            ->willReturnCallback(static function ($event) use (&$publishedEvents): void {
+                $publishedEvents[] = $event;
+            });
 
         $handler = new SubmitApplicationHandler($repository, $eventBus);
         $command = new SubmitApplication(
@@ -51,5 +53,9 @@ final class SubmitApplicationHandlerTest extends TestCase
         $id = $handler->handle($command);
 
         self::assertInstanceOf(ApplicationId::class, $id);
+        self::assertCount(2, $publishedEvents);
+        self::assertInstanceOf(ApplicationSubmitted::class, $publishedEvents[0]);
+        self::assertInstanceOf(EnrichmentRequested::class, $publishedEvents[1]);
+        self::assertTrue($id->equals($publishedEvents[1]->applicationId));
     }
 }

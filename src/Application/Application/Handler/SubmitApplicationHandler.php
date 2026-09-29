@@ -6,6 +6,7 @@ namespace App\Application\Application\Handler;
 
 use App\Application\Application\Command\SubmitApplication;
 use App\Application\Application\EventBus;
+use App\Application\Domain\Event\EnrichmentRequested;
 use App\Application\Domain\Model\JobApplication;
 use App\Application\Domain\Model\ValueObject\ApplicationId;
 use App\Application\Domain\Model\ValueObject\CVText;
@@ -42,6 +43,8 @@ final readonly class SubmitApplicationHandler
         foreach ($application->events() as $event) {
             $this->eventBus->publish($event);
         }
+
+        $this->eventBus->publish(new EnrichmentRequested($application->id));
 
         return $application->id;
     }
