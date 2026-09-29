@@ -1,0 +1,29 @@
+name: Viterbit Deptrac
+
+paths:
+  - ./src
+exclude_files:
+  - .*Test\.php$
+layers:
+  - name: Domain
+    collectors:
+      - type: directory
+        value: src/.+/Domain/.*
+
+  - name: Application
+    collectors:
+      - type: directory
+        value: src/.+/Application/.*
+
+  - name: Infrastructure
+    collectors:
+      - type: directory
+        value: src/.+/Infrastructure/.*
+
+ruleset:
+  Domain:
+  Application:
+    - Domain
+  Infrastructure:
+    - Domain
+    - Application
