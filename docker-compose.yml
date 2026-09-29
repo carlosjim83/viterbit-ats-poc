@@ -55,7 +55,8 @@ services:
     networks:
       - viterbit
     environment:
-      - APP_ENV=dev
+      - APP_ENV=prod
+      - APP_DEBUG=0
       - DATABASE_URL=postgresql://viterbit:viterbit@db:5432/viterbit?serverVersion=16&charset=utf8
     depends_on:
       - db
