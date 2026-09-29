@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Application\Infrastructure\Messaging;
+namespace App\Shared\Infrastructure\Messaging;
 
 use Ecotone\Messaging\Attribute\ServiceContext;
 use Ecotone\Messaging\Channel\MessageChannelBuilder;
 use Ecotone\SymfonyBundle\Messenger\SymfonyMessengerMessageChannelBuilder;
 
-final class MessagingConfiguration
+final class AsyncMessagingConfiguration
 {
     #[ServiceContext]
     public function enrichmentChannel(): MessageChannelBuilder

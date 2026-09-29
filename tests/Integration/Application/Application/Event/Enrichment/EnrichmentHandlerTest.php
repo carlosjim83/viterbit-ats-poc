@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Integration\Application\Infrastructure\Messaging;
+namespace App\Tests\Integration\Application\Application\Event\Enrichment;
 
+use App\Application\Application\Event\Enrichment\EnrichmentHandler;
 use App\Application\Domain\Event\EnrichmentRequested;
 use App\Application\Domain\LLMClientInterface;
 use App\Application\Domain\Model\ValueObject\ApplicationId;
 use App\Application\Domain\Repository\JobApplicationRepository;
-use App\Application\Infrastructure\Messaging\EnrichmentHandler;
 use App\Tests\Helpers\Mother\JobApplicationMother;
 use PHPUnit\Framework\TestCase;
 

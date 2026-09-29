@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Application\Infrastructure\Messaging;
+namespace App\Application\Application\Event\Enrichment;
 
 use App\Application\Domain\Event\EnrichmentRequested;
 use App\Application\Domain\LLMClientInterface;

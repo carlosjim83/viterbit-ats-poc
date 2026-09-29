@@ -31,8 +31,8 @@ final class EnrichmentFlowTest extends WebDatabaseTestCase
         self::assertIsString($applicationId);
 
         // Trigger enrichment directly via handler
-        $handler = static::getContainer()->get(\App\Application\Infrastructure\Messaging\EnrichmentHandler::class);
-        self::assertInstanceOf(\App\Application\Infrastructure\Messaging\EnrichmentHandler::class, $handler);
+        $handler = static::getContainer()->get(\App\Application\Application\Event\Enrichment\EnrichmentHandler::class);
+        self::assertInstanceOf(\App\Application\Application\Event\Enrichment\EnrichmentHandler::class, $handler);
         $handler->handle(new \App\Application\Domain\Event\EnrichmentRequested(
             \App\Application\Domain\Model\ValueObject\ApplicationId::fromString($applicationId)
         ));

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Application\Infrastructure\Messaging;
+namespace App\Shared\Infrastructure\Messaging;
 
 use App\Shared\Domain\EventBus;
 use Ecotone\Modelling\EventBus as EcotoneEventBusInterface;
