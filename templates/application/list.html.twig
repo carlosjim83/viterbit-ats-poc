@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Applications{% endblock %}
+
+{% block body %}
+<div class="max-w-6xl mx-auto p-6">
+    <h1 class="text-2xl font-bold mb-6">Job Applications</h1>
+
+    <form method="get" action="{{ path('applications_list') }}" class="mb-6 flex gap-4 flex-wrap">
+        <div>
+            <label for="status" class="block text-sm font-medium mb-1">Status</label>
+            <select name="status" id="status" class="border rounded px-3 py-2">
+                <option value="" {% if filters.status == '' %}selected{% endif %}>All</option>
+                <option value="received" {% if filters.status == 'received' %}selected{% endif %}>Received</option>
+                <option value="enriching" {% if filters.status == 'enriching' %}selected{% endif %}>Enriching</option>
+                <option value="enriched" {% if filters.status == 'enriched' %}selected{% endif %}>Enriched</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="position" class="block text-sm font-medium mb-1">Position</label>
+            <input type="text" name="position" id="position" value="{{ filters.position }}" placeholder="Any position" class="border rounded px-3 py-2">
+        </div>
+
+        <div>
+            <label for="search" class="block text-sm font-medium mb-1">Search</label>
+            <input type="text" name="search" id="search" value="{{ filters.search }}" placeholder="Name or email" class="border rounded px-3 py-2">
+        </div>
+
+        <div class="flex items-end">
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Filter</button>
+        </div>
+    </form>
+
+    {% if applications is empty %}
+        <p class="text-gray-600">No applications found.</p>
+    {% else %}
+        <table class="w-full border-collapse border border-gray-300">
+            <thead>
+                <tr class="bg-gray-100">
+                    <th class="border border-gray-300 px-4 py-2 text-left">Name</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Email</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Position</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Status</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Score</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Applied At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app in applications %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="border border-gray-300 px-4 py-2">{{ app.fullName }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ app.email }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ app.position }}</td>
+                        <td class="border border-gray-300 px-4 py-2">
+                            <span class="inline-block px-2 py-1 text-xs rounded {{ app.status == 'enriched' ? 'bg-green-100 text-green-800' : app.status == 'enriching' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800' }}">
+                                {{ app.status|capitalize }}
+                            </span>
+                        </td>
+                        <td class="border border-gray-300 px-4 py-2">{{ app.score ?? '-' }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ app.appliedAt|date('Y-m-d H:i') }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+{% endblock %}
