@@ -24,4 +24,14 @@ final readonly class Status
     {
         return new self('enriched');
     }
+
+    public static function fromString(string $value): self
+    {
+        return match ($value) {
+            'received' => self::received(),
+            'enriching' => self::enriching(),
+            'enriched' => self::enriched(),
+            default => throw new \InvalidArgumentException(sprintf('Invalid status: %s', $value)),
+        };
+    }
 }

@@ -27,4 +27,9 @@
             <directory>src</directory>
         </include>
     </source>
+
+    <php>
+        <env name="APP_ENV" value="test" force="true" />
+        <env name="KERNEL_CLASS" value="App\Kernel" />
+    </php>
 </phpunit>
