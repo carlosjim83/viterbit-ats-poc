@@ -1,18 +1,27 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Application Submitted — Viterbit ATS</title>
-    <style>
-        body { font-family: system-ui, sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 1rem; text-align: center; }
-        h1 { color: #16a34a; }
-        a { color: #2563eb; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-    </style>
-</head>
-<body>
-    <h1>✓ Application Submitted</h1>
-    <p>Thank you! Your application has been received and will be reviewed shortly.</p>
-    <p><a href="{{ path('apply') }}">Submit another application</a></p>
-</body>
-</html>
+{% extends 'base.html.twig' %}
+
+{% block title %}Application Submitted — Viterbit ATS{% endblock %}
+
+{% block body %}
+<div class="max-w-xl mx-auto p-6">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+            <svg class="h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
+        </div>
+
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">Application Submitted</h1>
+        <p class="text-gray-600 mb-8">Thank you! Your application has been received and will be reviewed shortly.</p>
+
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a href="{{ path('apply') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                Submit another application
+            </a>
+            <a href="{{ path('applications_list') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                View applications
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

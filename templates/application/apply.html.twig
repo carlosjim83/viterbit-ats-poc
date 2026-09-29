@@ -1,65 +1,82 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Apply for a Job — Viterbit ATS</title>
-    <style>
-        body { font-family: system-ui, sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
-        h1 { color: #333; }
-        .field { margin-bottom: 1rem; }
-        label { display: block; font-weight: 600; margin-bottom: 0.25rem; }
-        input[type="text"], input[type="email"], textarea { width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; }
-        textarea { min-height: 120px; resize: vertical; }
-        button { padding: 0.75rem 1.5rem; background: #2563eb; color: white; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer; }
-        button:hover { background: #1d4ed8; }
-        .error { color: #dc2626; font-size: 0.875rem; }
-        .errors { background: #fef2f2; border: 1px solid #fecaca; padding: 1rem; border-radius: 4px; margin-bottom: 1rem; }
-    </style>
-</head>
-<body>
-    <h1>Apply for a Job</h1>
+{% extends 'base.html.twig' %}
 
-    {% if errors.general is defined %}
-        <div class="errors">{{ errors.general }}</div>
-    {% endif %}
+{% block title %}Apply for a Job — Viterbit ATS{% endblock %}
 
-    <form method="post" action="{{ path('apply') }}">
-        <div class="field">
-            <label for="fullName">Full Name</label>
-            <input type="text" id="fullName" name="fullName" value="{{ data.fullName|default('') }}">
-            {% if errors.fullName is defined %}<div class="error">{{ errors.fullName }}</div>{% endif %}
-        </div>
+{% block body %}
+<div class="max-w-xl mx-auto p-6">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+        <h1 class="text-2xl font-bold text-gray-900 mb-1">Apply for a Job</h1>
+        <p class="text-sm text-gray-500 mb-6">Fill in your details and paste your CV below.</p>
 
-        <div class="field">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" value="{{ data.email|default('') }}">
-            {% if errors.email is defined %}<div class="error">{{ errors.email }}</div>{% endif %}
-        </div>
+        {% if errors.general is defined %}
+            <div class="mb-6 p-4 rounded-md bg-red-50 border border-red-200 text-red-700 text-sm">
+                {{ errors.general }}
+            </div>
+        {% endif %}
 
-        <div class="field">
-            <label for="phone">Phone</label>
-            <input type="text" id="phone" name="phone" value="{{ data.phone|default('') }}">
-            {% if errors.phone is defined %}<div class="error">{{ errors.phone }}</div>{% endif %}
-        </div>
+        <form method="post" action="{{ path('apply') }}" class="space-y-5">
+            <div>
+                <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <input type="text" id="fullName" name="fullName" value="{{ data.fullName|default('') }}"
+                       class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border {% if errors.fullName is defined %}border-red-300 focus:border-red-500 focus:ring-red-500{% endif %}">
+                {% if errors.fullName is defined %}
+                    <p class="error mt-1 text-sm text-red-600">{{ errors.fullName }}</p>
+                {% endif %}
+            </div>
 
-        <div class="field">
-            <label for="position">Position</label>
-            <input type="text" id="position" name="position" value="{{ data.position|default('') }}">
-            {% if errors.position is defined %}<div class="error">{{ errors.position }}</div>{% endif %}
-        </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="email" name="email" value="{{ data.email|default('') }}"
+                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border {% if errors.email is defined %}border-red-300 focus:border-red-500 focus:ring-red-500{% endif %}">
+                    {% if errors.email is defined %}
+                        <p class="error mt-1 text-sm text-red-600">{{ errors.email }}</p>
+                    {% endif %}
+                </div>
 
-        <div class="field">
-            <label for="notes">Notes (optional)</label>
-            <textarea id="notes" name="notes">{{ data.notes|default('') }}</textarea>
-        </div>
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                    <input type="text" id="phone" name="phone" value="{{ data.phone|default('') }}"
+                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border {% if errors.phone is defined %}border-red-300 focus:border-red-500 focus:ring-red-500{% endif %}">
+                    {% if errors.phone is defined %}
+                        <p class="error mt-1 text-sm text-red-600">{{ errors.phone }}</p>
+                    {% endif %}
+                </div>
+            </div>
 
-        <div class="field">
-            <label for="cvText">CV (paste as plain text)</label>
-            <textarea id="cvText" name="cvText" placeholder="Paste your CV here...">{{ data.cvText|default('') }}</textarea>
-            {% if errors.cvText is defined %}<div class="error">{{ errors.cvText }}</div>{% endif %}
-        </div>
+            <div>
+                <label for="position" class="block text-sm font-medium text-gray-700 mb-1">Position</label>
+                <input type="text" id="position" name="position" value="{{ data.position|default('') }}"
+                       class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border {% if errors.position is defined %}border-red-300 focus:border-red-500 focus:ring-red-500{% endif %}">
+                {% if errors.position is defined %}
+                    <p class="error mt-1 text-sm text-red-600">{{ errors.position }}</p>
+                {% endif %}
+            </div>
 
-        <button type="submit">Submit Application</button>
-    </form>
-</body>
-</html>
+            <div>
+                <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Notes <span class="text-gray-400 font-normal">(optional)</span></label>
+                <textarea id="notes" name="notes" rows="3"
+                          class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border resize-y">{{ data.notes|default('') }}</textarea>
+            </div>
+
+            <div>
+                <label for="cvText" class="block text-sm font-medium text-gray-700 mb-1">CV <span class="text-gray-400 font-normal">(paste as plain text)</span></label>
+                <textarea id="cvText" name="cvText" rows="6" placeholder="Paste your CV here..."
+                          class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border resize-y {% if errors.cvText is defined %}border-red-300 focus:border-red-500 focus:ring-red-500{% endif %}">{{ data.cvText|default('') }}</textarea>
+                {% if errors.cvText is defined %}
+                    <p class="error mt-1 text-sm text-red-600">{{ errors.cvText }}</p>
+                {% endif %}
+            </div>
+
+            <div class="flex items-center gap-4 pt-2">
+                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                    Submit Application
+                </button>
+                <a href="{{ path('applications_list') }}" class="text-sm text-gray-500 hover:text-gray-700 transition-colors">
+                    View all applications →
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
