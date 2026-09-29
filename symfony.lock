@@ -40,8 +40,8 @@
             "tests/bootstrap.php"
         ]
     },
-    "qossmic/deptrac-shim": {
-        "version": "1.0.2"
+    "qossmic/deptrac": {
+        "version": "2.0.4"
     },
     "symfony/asset-mapper": {
         "version": "7.4",

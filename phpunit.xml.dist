@@ -21,4 +21,10 @@
             <html outputDirectory="var/coverage/html"/>
         </report>
     </coverage>
+
+    <source>
+        <include>
+            <directory>src</directory>
+        </include>
+    </source>
 </phpunit>

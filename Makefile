@@ -1,7 +1,7 @@
 # Viterbit ATS PoC — Docker-based Makefile
 # No commands should run directly on the host; always use `make <target>`.
 
-.PHONY: init up down build test test-unit test-integration cs-fix stan deptrac lint sh validate
+.PHONY: init up down build test test-unit test-integration cs-fix stan deptrac lint sh validate install-hooks
 
 # ---------------------------------------------------------------------------
 # Lifecycle
@@ -54,6 +54,15 @@ test-integration:
 # ---------------------------------------------------------------------------
 
 validate: lint test
+
+# ---------------------------------------------------------------------------
+# Git Hooks
+# ---------------------------------------------------------------------------
+
+install-hooks:
+	cp tools/git-hooks/pre-commit .git/hooks/pre-commit
+	chmod +x .git/hooks/pre-commit
+	@echo "Git pre-commit hook installed."
 
 # ---------------------------------------------------------------------------
 # Utils

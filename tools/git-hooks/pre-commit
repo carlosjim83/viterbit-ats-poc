@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+#
+# Git pre-commit hook for Viterbit ATS PoC
+# Ensures linting and tests pass before allowing a commit.
+#
+# Install: chmod +x .git/hooks/pre-commit
+# Or run: make install-hooks
+
+set -euo pipefail
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo "${YELLOW}==> Running pre-commit checks...${NC}"
+
+# Check if Docker is running
+if ! docker compose ps &> /dev/null; then
+    echo "${RED}ERROR: Docker is not running or containers are not up.${NC}"
+    echo "Please run 'make up' first."
+    exit 1
+fi
+
+# Run lint (CS-Fixer dry-run + PHPStan + Deptrac)
+echo ""
+echo "${YELLOW}==> Running lint checks...${NC}"
+docker compose exec -T php php vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "${RED}FAIL: PHP-CS-Fixer found issues.${NC}"
+    echo "Run 'make cs-fix' to auto-fix them."
+    exit 1
+fi
+
+docker compose exec -T php php vendor/bin/phpstan analyse --memory-limit=1G --no-progress
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "${RED}FAIL: PHPStan found errors.${NC}"
+    exit 1
+fi
+
+docker compose exec -T php php vendor/bin/deptrac analyse --no-progress
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "${RED}FAIL: Deptrac found architecture violations.${NC}"
+    exit 1
+fi
+
+# Run tests
+echo ""
+echo "${YELLOW}==> Running tests...${NC}"
+docker compose exec -T php php vendor/bin/phpunit --colors=never
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "${RED}FAIL: PHPUnit tests failed.${NC}"
+    exit 1
+fi
+
+echo ""
+echo "${GREEN}==> All pre-commit checks passed!${NC}"
+exit 0
