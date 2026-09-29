@@ -16,8 +16,7 @@ use App\Application\Domain\Model\ValueObject\Status;
 
 final class JobApplication
 {
-    /** @var list<object> */
-    private array $recordedEvents = [];
+    use WithEvents;
 
     public ?string $summary = null;
     public ?int $score = null;
@@ -67,15 +66,6 @@ final class JobApplication
         return new self($id, $fullName, $email, $phone, $position, $notes, $cvText, $status, $appliedAt);
     }
 
-    /** @return list<object> */
-    public function events(): array
-    {
-        $events = $this->recordedEvents;
-        $this->recordedEvents = [];
-
-        return $events;
-    }
-
     public function requestEnrichment(): void
     {
         if ('received' !== $this->status->value) {
@@ -94,10 +84,5 @@ final class JobApplication
         $this->summary = $summary;
         $this->score = $score;
         $this->status = Status::enriched();
-    }
-
-    private function recordEvent(object $event): void
-    {
-        $this->recordedEvents[] = $event;
     }
 }
