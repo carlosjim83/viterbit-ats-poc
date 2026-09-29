@@ -67,13 +67,80 @@ final class DoctrineJobApplicationRepositoryTest extends KernelTestCase
         self::assertCount(2, $all);
     }
 
-    private function createApplication(): JobApplication
+    public function testFindByCriteriaFiltersByPosition(): void
+    {
+        $app1 = $this->createApplication('Alice', 'alice@example.com', 'Engineer');
+        $app2 = $this->createApplication('Bob', 'bob@example.com', 'Manager');
+        $this->repository->save($app1);
+        $this->repository->save($app2);
+
+        $filtered = $this->repository->findByCriteria(['position' => 'Engineer']);
+
+        self::assertCount(1, $filtered);
+        self::assertSame('Alice', $filtered[0]->fullName->value);
+    }
+
+    public function testFindByCriteriaSearchesByName(): void
+    {
+        $app1 = $this->createApplication('Alice Smith', 'alice@example.com');
+        $app2 = $this->createApplication('Bob Jones', 'bob@example.com');
+        $this->repository->save($app1);
+        $this->repository->save($app2);
+
+        $filtered = $this->repository->findByCriteria(['search' => 'Alice']);
+
+        self::assertCount(1, $filtered);
+        self::assertSame('Alice Smith', $filtered[0]->fullName->value);
+    }
+
+    public function testFindByCriteriaSearchesByEmail(): void
+    {
+        $app1 = $this->createApplication('Alice', 'alice@example.com');
+        $app2 = $this->createApplication('Bob', 'bob@example.com');
+        $this->repository->save($app1);
+        $this->repository->save($app2);
+
+        $filtered = $this->repository->findByCriteria(['search' => 'bob@example.com']);
+
+        self::assertCount(1, $filtered);
+        self::assertSame('Bob', $filtered[0]->fullName->value);
+    }
+
+    public function testFindByCriteriaSearchIsCaseInsensitive(): void
+    {
+        $app1 = $this->createApplication('Alice', 'alice@example.com');
+        $this->repository->save($app1);
+
+        $filtered = $this->repository->findByCriteria(['search' => 'ALICE']);
+
+        self::assertCount(1, $filtered);
+    }
+
+    public function testFindByCriteriaReturnsNewestFirst(): void
+    {
+        $app1 = $this->createApplication('First', 'first@example.com');
+        $this->repository->save($app1);
+
+        // Sleep to ensure different timestamps (PostgreSQL timestamp precision is seconds)
+        sleep(1);
+
+        $app2 = $this->createApplication('Second', 'second@example.com');
+        $this->repository->save($app2);
+
+        $filtered = $this->repository->findByCriteria([]);
+
+        self::assertCount(2, $filtered);
+        self::assertSame('Second', $filtered[0]->fullName->value);
+        self::assertSame('First', $filtered[1]->fullName->value);
+    }
+
+    private function createApplication(string $name = 'Test User', string $email = 'test@example.com', string $position = 'Developer'): JobApplication
     {
         return JobApplication::submit(
-            new FullName('Test User'),
-            new Email('test@example.com'),
+            new FullName($name),
+            new Email($email),
             new Phone('+1234567890'),
-            new Position('Developer'),
+            new Position($position),
             new Notes(''),
             new CVText('Some experience'),
         );

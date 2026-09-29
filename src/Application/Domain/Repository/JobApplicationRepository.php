@@ -15,4 +15,11 @@ interface JobApplicationRepository
 
     /** @return list<JobApplication> */
     public function findAll(): array;
+
+    /**
+     * @param array{status?: string, position?: string, search?: string} $criteria
+     *
+     * @return list<JobApplication>
+     */
+    public function findByCriteria(array $criteria): array;
 }

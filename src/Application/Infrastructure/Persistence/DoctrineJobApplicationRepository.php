@@ -70,7 +70,44 @@ final readonly class DoctrineJobApplicationRepository implements JobApplicationR
 
     public function findAll(): array
     {
-        $entities = $this->entityManager->getRepository(DoctrineJobApplication::class)->findAll();
+        $entities = $this->entityManager->getRepository(DoctrineJobApplication::class)
+            ->findBy([], ['appliedAt' => 'DESC']);
+
+        $applications = [];
+        foreach ($entities as $entity) {
+            $applications[] = $this->toAggregate($entity);
+        }
+
+        return $applications;
+    }
+
+    public function findByCriteria(array $criteria): array
+    {
+        $qb = $this->entityManager->getRepository(DoctrineJobApplication::class)
+            ->createQueryBuilder('ja')
+            ->orderBy('ja.appliedAt', 'DESC');
+
+        if (isset($criteria['status']) && '' !== $criteria['status']) {
+            $qb->andWhere('ja.status = :status')
+                ->setParameter('status', $criteria['status']);
+        }
+
+        if (isset($criteria['position']) && '' !== $criteria['position']) {
+            $qb->andWhere('ja.position = :position')
+                ->setParameter('position', $criteria['position']);
+        }
+
+        if (isset($criteria['search']) && '' !== $criteria['search']) {
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    'LOWER(ja.fullName) LIKE LOWER(:search)',
+                    'LOWER(ja.email) LIKE LOWER(:search)',
+                )
+            )->setParameter('search', '%'.$criteria['search'].'%');
+        }
+
+        /** @var list<DoctrineJobApplication> $entities */
+        $entities = $qb->getQuery()->getResult();
 
         $applications = [];
         foreach ($entities as $entity) {

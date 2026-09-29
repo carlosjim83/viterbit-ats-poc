@@ -56,13 +56,98 @@ final class JobApplicationRepositoryTest extends TestCase
         self::assertCount(2, $all);
     }
 
-    private function createApplication(): JobApplication
+    public function testFindByCriteriaFiltersByStatus(): void
+    {
+        $app1 = $this->createApplication('Alice', 'alice@example.com', 'Engineer');
+        $app2 = $this->createApplication('Bob', 'bob@example.com', 'Manager');
+        $this->repository->save($app1);
+        $this->repository->save($app2);
+
+        $filtered = $this->repository->findByCriteria(['status' => 'received']);
+
+        self::assertCount(2, $filtered);
+    }
+
+    public function testFindByCriteriaFiltersByPosition(): void
+    {
+        $app1 = $this->createApplication('Alice', 'alice@example.com', 'Engineer');
+        $app2 = $this->createApplication('Bob', 'bob@example.com', 'Manager');
+        $this->repository->save($app1);
+        $this->repository->save($app2);
+
+        $filtered = $this->repository->findByCriteria(['position' => 'Engineer']);
+
+        self::assertCount(1, $filtered);
+        self::assertSame('Alice', $filtered[0]->fullName->value);
+    }
+
+    public function testFindByCriteriaSearchesByName(): void
+    {
+        $app1 = $this->createApplication('Alice Smith', 'alice@example.com');
+        $app2 = $this->createApplication('Bob Jones', 'bob@example.com');
+        $this->repository->save($app1);
+        $this->repository->save($app2);
+
+        $filtered = $this->repository->findByCriteria(['search' => 'Alice']);
+
+        self::assertCount(1, $filtered);
+        self::assertSame('Alice Smith', $filtered[0]->fullName->value);
+    }
+
+    public function testFindByCriteriaSearchesByEmail(): void
+    {
+        $app1 = $this->createApplication('Alice', 'alice@example.com');
+        $app2 = $this->createApplication('Bob', 'bob@example.com');
+        $this->repository->save($app1);
+        $this->repository->save($app2);
+
+        $filtered = $this->repository->findByCriteria(['search' => 'bob@example.com']);
+
+        self::assertCount(1, $filtered);
+        self::assertSame('Bob', $filtered[0]->fullName->value);
+    }
+
+    public function testFindByCriteriaSearchIsCaseInsensitive(): void
+    {
+        $app1 = $this->createApplication('Alice', 'alice@example.com');
+        $this->repository->save($app1);
+
+        $filtered = $this->repository->findByCriteria(['search' => 'ALICE']);
+
+        self::assertCount(1, $filtered);
+    }
+
+    public function testFindByCriteriaWithNoCriteriaReturnsAll(): void
+    {
+        $app1 = $this->createApplication();
+        $app2 = $this->createApplication();
+        $this->repository->save($app1);
+        $this->repository->save($app2);
+
+        $filtered = $this->repository->findByCriteria([]);
+
+        self::assertCount(2, $filtered);
+    }
+
+    public function testFindByCriteriaWithEmptyStringsReturnsAll(): void
+    {
+        $app1 = $this->createApplication();
+        $app2 = $this->createApplication();
+        $this->repository->save($app1);
+        $this->repository->save($app2);
+
+        $filtered = $this->repository->findByCriteria(['status' => '', 'position' => '', 'search' => '']);
+
+        self::assertCount(2, $filtered);
+    }
+
+    private function createApplication(string $name = 'Test User', string $email = 'test@example.com', string $position = 'Developer'): JobApplication
     {
         return JobApplication::submit(
-            new FullName('Test User'),
-            new Email('test@example.com'),
+            new FullName($name),
+            new Email($email),
             new Phone('+1234567890'),
-            new Position('Developer'),
+            new Position($position),
             new Notes(''),
             new CVText('Some experience'),
         );
@@ -86,6 +171,42 @@ final class InMemoryJobApplicationRepository implements JobApplicationRepository
 
     public function findAll(): array
     {
-        return array_values($this->applications);
+        $apps = array_values($this->applications);
+        usort($apps, static fn (JobApplication $a, JobApplication $b): int => $b->appliedAt <=> $a->appliedAt);
+
+        return $apps;
+    }
+
+    public function findByCriteria(array $criteria): array
+    {
+        $apps = $this->findAll();
+
+        if ([] === $criteria || ('' === ($criteria['status'] ?? '') && '' === ($criteria['position'] ?? '') && '' === ($criteria['search'] ?? ''))) {
+            return $apps;
+        }
+
+        $filtered = [];
+        foreach ($apps as $app) {
+            if (isset($criteria['status']) && '' !== $criteria['status'] && $app->status->value !== $criteria['status']) {
+                continue;
+            }
+
+            if (isset($criteria['position']) && '' !== $criteria['position'] && $app->position->value !== $criteria['position']) {
+                continue;
+            }
+
+            if (isset($criteria['search']) && '' !== $criteria['search']) {
+                $search = strtolower($criteria['search']);
+                $match = str_contains(strtolower($app->fullName->value), $search)
+                    || str_contains(strtolower($app->email->value), $search);
+                if (!$match) {
+                    continue;
+                }
+            }
+
+            $filtered[] = $app;
+        }
+
+        return $filtered;
     }
 }
