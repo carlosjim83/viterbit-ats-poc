@@ -5,16 +5,15 @@ services:
       dockerfile: Dockerfile
     container_name: viterbit-php
     working_dir: /app
+    env_file: .env
     volumes:
       - .:/app:cached
       - ./docker/php/conf.d/memory-limit.ini:/usr/local/etc/php/conf.d/memory-limit.ini:ro
     networks:
       - viterbit
-    environment:
-      - APP_ENV=dev
-      - DATABASE_URL=postgresql://viterbit:viterbit@db:5432/viterbit?serverVersion=16&charset=utf8
     depends_on:
       - db
+    restart: unless-stopped
 
   nginx:
     image: nginx:alpine
@@ -28,6 +27,7 @@ services:
       - viterbit
     depends_on:
       - php
+    restart: unless-stopped
 
   db:
     image: postgres:16-alpine
@@ -42,6 +42,7 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - viterbit
+    restart: unless-stopped
 
   messenger:
     build:
@@ -49,15 +50,15 @@ services:
       dockerfile: Dockerfile
     container_name: viterbit-messenger
     working_dir: /app
+    env_file: .env
+    environment:
+      - APP_ENV=prod
+      - APP_DEBUG=0
     volumes:
       - .:/app:cached
       - ./docker/php/conf.d/memory-limit.ini:/usr/local/etc/php/conf.d/memory-limit.ini:ro
     networks:
       - viterbit
-    environment:
-      - APP_ENV=prod
-      - APP_DEBUG=0
-      - DATABASE_URL=postgresql://viterbit:viterbit@db:5432/viterbit?serverVersion=16&charset=utf8
     depends_on:
       - db
     restart: unless-stopped
