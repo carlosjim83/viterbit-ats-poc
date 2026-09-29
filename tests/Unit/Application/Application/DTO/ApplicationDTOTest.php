@@ -18,7 +18,7 @@ final class ApplicationDTOTest extends TestCase
             position: 'Engineer',
             status: 'PENDING',
             appliedAt: '2025-09-29T13:00:00+00:00',
-            score: 87.5,
+            score: 87,
         );
 
         self::assertSame('app-123', $dto->id);
@@ -27,7 +27,7 @@ final class ApplicationDTOTest extends TestCase
         self::assertSame('Engineer', $dto->position);
         self::assertSame('PENDING', $dto->status);
         self::assertSame('2025-09-29T13:00:00+00:00', $dto->appliedAt);
-        self::assertSame(87.5, $dto->score);
+        self::assertSame(87, $dto->score);
     }
 
     public function testScoreIsNullable(): void

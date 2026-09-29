@@ -73,6 +73,28 @@ final class ListApplicationsHandlerTest extends TestCase
         self::assertSame([], $result);
     }
 
+    public function testItPropagatesScoreFromEnrichedApplication(): void
+    {
+        $application = JobApplicationMother::builder()
+            ->withName('Ada Lovelace')
+            ->withEmail('ada@example.com')
+            ->withPosition('Engineer')
+            ->build();
+        $application->requestEnrichment();
+        $application->completeEnrichment('Great candidate', 95);
+
+        $repository = $this->createMock(JobApplicationRepository::class);
+        $repository->method('findByCriteria')
+            ->with([])
+            ->willReturn([$application]);
+
+        $handler = new ListApplicationsHandler($repository);
+        $result = $handler->handle(new ListApplications());
+
+        self::assertCount(1, $result);
+        self::assertSame(95, $result[0]->score);
+    }
+
     public function testItIgnoresEmptyCriteria(): void
     {
         $repository = $this->createMock(JobApplicationRepository::class);

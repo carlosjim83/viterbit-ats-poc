@@ -45,7 +45,7 @@ final readonly class ListApplicationsHandler
                 position: $app->position->value,
                 status: $app->status->value,
                 appliedAt: $app->appliedAt->format('c'),
-                score: null,
+                score: $app->score,
             );
         }
 

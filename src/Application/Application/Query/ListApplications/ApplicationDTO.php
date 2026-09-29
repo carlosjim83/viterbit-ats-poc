@@ -13,7 +13,7 @@ final readonly class ApplicationDTO
         public string $position,
         public string $status,
         public string $appliedAt,
-        public ?float $score = null,
+        public ?int $score = null,
     ) {
     }
 }
