@@ -6,32 +6,21 @@ namespace App\Tests\Integration\Application\Application\Handler;
 
 use App\Application\Application\Handler\ListApplicationsHandler;
 use App\Application\Application\Query\ListApplications;
-use App\Application\Infrastructure\Persistence\DoctrineJobApplicationRepository;
-use App\Tests\Helpers\Mother\JobApplicationMother;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use App\Tests\DatabaseTestCase;
 
-final class ListApplicationsHandlerTest extends KernelTestCase
+final class ListApplicationsHandlerTest extends DatabaseTestCase
 {
     private ListApplicationsHandler $handler;
-    private DoctrineJobApplicationRepository $repository;
 
     protected function setUp(): void
     {
-        self::bootKernel();
-        /** @var EntityManagerInterface $em */
-        $em = self::getContainer()->get(EntityManagerInterface::class);
-        $this->repository = new DoctrineJobApplicationRepository($em);
-        $this->handler = new ListApplicationsHandler($this->repository);
-
-        $conn = $em->getConnection();
-        $conn->executeStatement('DELETE FROM job_applications');
+        parent::setUp();
+        $this->handler = new ListApplicationsHandler($this->doctrineJobApplicationRepository());
     }
 
     public function testItReturnsApplicationDTOsFromDatabase(): void
     {
-        $app = $this->createApplication('Ada Lovelace', 'ada@example.com', 'Engineer');
-        $this->repository->save($app);
+        $app = $this->givenApplication('Ada Lovelace', 'ada@example.com', 'Engineer');
 
         $result = $this->handler->handle(new ListApplications());
 
@@ -42,8 +31,8 @@ final class ListApplicationsHandlerTest extends KernelTestCase
 
     public function testItFiltersByPosition(): void
     {
-        $this->repository->save($this->createApplication('Alice', 'alice@example.com', 'Engineer'));
-        $this->repository->save($this->createApplication('Bob', 'bob@example.com', 'Manager'));
+        $this->givenApplication('Alice', 'alice@example.com', 'Engineer');
+        $this->givenApplication('Bob', 'bob@example.com', 'Manager');
 
         $result = $this->handler->handle(new ListApplications(position: 'Engineer'));
 
@@ -53,8 +42,8 @@ final class ListApplicationsHandlerTest extends KernelTestCase
 
     public function testItSearchesByName(): void
     {
-        $this->repository->save($this->createApplication('Alice Smith', 'alice@example.com'));
-        $this->repository->save($this->createApplication('Bob Jones', 'bob@example.com'));
+        $this->givenApplication('Alice Smith', 'alice@example.com');
+        $this->givenApplication('Bob Jones', 'bob@example.com');
 
         $result = $this->handler->handle(new ListApplications(search: 'Alice'));
 
@@ -64,23 +53,14 @@ final class ListApplicationsHandlerTest extends KernelTestCase
 
     public function testItReturnsNewestFirst(): void
     {
-        $this->repository->save($this->createApplication('First', 'first@example.com'));
+        $this->givenApplication('First', 'first@example.com');
         sleep(1);
-        $this->repository->save($this->createApplication('Second', 'second@example.com'));
+        $this->givenApplication('Second', 'second@example.com');
 
         $result = $this->handler->handle(new ListApplications());
 
         self::assertCount(2, $result);
         self::assertSame('Second', $result[0]->fullName);
         self::assertSame('First', $result[1]->fullName);
-    }
-
-    private function createApplication(string $name = 'Test User', string $email = 'test@example.com', string $position = 'Developer'): \App\Application\Domain\Model\JobApplication
-    {
-        return JobApplicationMother::builder()
-            ->withName($name)
-            ->withEmail($email)
-            ->withPosition($position)
-            ->build();
     }
 }

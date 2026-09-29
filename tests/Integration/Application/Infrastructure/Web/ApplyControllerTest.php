@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Application\Infrastructure\Web;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\Tests\WebDatabaseTestCase;
 
-final class ApplyControllerTest extends WebTestCase
+final class ApplyControllerTest extends WebDatabaseTestCase
 {
     public function testApplyPageLoads(): void
     {
@@ -28,11 +27,6 @@ final class ApplyControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        /** @var EntityManagerInterface $em */
-        $em = self::getContainer()->get(EntityManagerInterface::class);
-        $conn = $em->getConnection();
-        $conn->executeStatement('DELETE FROM job_applications');
-
         $client->request('POST', '/apply', [
             'fullName' => 'Alice Smith',
             'email' => 'alice@example.com',
@@ -45,6 +39,7 @@ final class ApplyControllerTest extends WebTestCase
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h1', 'Application Submitted');
 
+        $conn = $this->entityManager()->getConnection();
         $row = $conn->fetchAssociative('SELECT * FROM job_applications WHERE email = ?', ['alice@example.com']);
         self::assertNotFalse($row);
         self::assertSame('Alice Smith', $row['full_name']);

@@ -33,4 +33,8 @@
         <env name="KERNEL_CLASS" value="App\Kernel" />
         <env name="DEFAULT_URI" value="http://localhost" />
     </php>
+
+    <extensions>
+        <bootstrap class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension"/>
+    </extensions>
 </phpunit>

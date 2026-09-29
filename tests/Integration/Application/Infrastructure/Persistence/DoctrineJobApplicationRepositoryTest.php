@@ -4,34 +4,16 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Application\Infrastructure\Persistence;
 
-use App\Application\Infrastructure\Persistence\DoctrineJobApplicationRepository;
-use App\Tests\Helpers\Mother\JobApplicationMother;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use App\Application\Domain\Model\ValueObject\ApplicationId;
+use App\Tests\DatabaseTestCase;
 
-final class DoctrineJobApplicationRepositoryTest extends KernelTestCase
+final class DoctrineJobApplicationRepositoryTest extends DatabaseTestCase
 {
-    private DoctrineJobApplicationRepository $repository;
-    private EntityManagerInterface $em;
-
-    protected function setUp(): void
-    {
-        self::bootKernel();
-        /** @var EntityManagerInterface $em */
-        $em = self::getContainer()->get(EntityManagerInterface::class);
-        $this->em = $em;
-        $this->repository = new DoctrineJobApplicationRepository($this->em);
-
-        $conn = $this->em->getConnection();
-        $conn->executeStatement('DELETE FROM job_applications');
-    }
-
     public function testSaveAndFindById(): void
     {
-        $application = $this->createApplication();
-        $this->repository->save($application);
+        $application = $this->givenApplication();
 
-        $found = $this->repository->findById($application->id);
+        $found = $this->doctrineJobApplicationRepository()->findById($application->id);
 
         self::assertNotNull($found);
         self::assertTrue($application->id->equals($found->id));
@@ -40,35 +22,29 @@ final class DoctrineJobApplicationRepositoryTest extends KernelTestCase
 
     public function testFindByIdReturnsNullForUnknown(): void
     {
-        $id = \App\Application\Domain\Model\ValueObject\ApplicationId::fromString(
-            '550e8400-e29b-41d4-a716-446655440000'
-        );
+        $id = ApplicationId::fromString('550e8400-e29b-41d4-a716-446655440000');
 
-        $found = $this->repository->findById($id);
+        $found = $this->doctrineJobApplicationRepository()->findById($id);
 
         self::assertNull($found);
     }
 
     public function testFindAllReturnsSavedApplications(): void
     {
-        $app1 = $this->createApplication();
-        $app2 = $this->createApplication();
-        $this->repository->save($app1);
-        $this->repository->save($app2);
+        $this->givenApplication('User One', 'one@example.com');
+        $this->givenApplication('User Two', 'two@example.com');
 
-        $all = $this->repository->findAll();
+        $all = $this->doctrineJobApplicationRepository()->findAll();
 
         self::assertCount(2, $all);
     }
 
     public function testFindByCriteriaFiltersByPosition(): void
     {
-        $app1 = $this->createApplication('Alice', 'alice@example.com', 'Engineer');
-        $app2 = $this->createApplication('Bob', 'bob@example.com', 'Manager');
-        $this->repository->save($app1);
-        $this->repository->save($app2);
+        $this->givenApplication('Alice', 'alice@example.com', 'Engineer');
+        $this->givenApplication('Bob', 'bob@example.com', 'Manager');
 
-        $filtered = $this->repository->findByCriteria(['position' => 'Engineer']);
+        $filtered = $this->doctrineJobApplicationRepository()->findByCriteria(['position' => 'Engineer']);
 
         self::assertCount(1, $filtered);
         self::assertSame('Alice', $filtered[0]->fullName->value);
@@ -76,12 +52,10 @@ final class DoctrineJobApplicationRepositoryTest extends KernelTestCase
 
     public function testFindByCriteriaSearchesByName(): void
     {
-        $app1 = $this->createApplication('Alice Smith', 'alice@example.com');
-        $app2 = $this->createApplication('Bob Jones', 'bob@example.com');
-        $this->repository->save($app1);
-        $this->repository->save($app2);
+        $this->givenApplication('Alice Smith', 'alice@example.com');
+        $this->givenApplication('Bob Jones', 'bob@example.com');
 
-        $filtered = $this->repository->findByCriteria(['search' => 'Alice']);
+        $filtered = $this->doctrineJobApplicationRepository()->findByCriteria(['search' => 'Alice']);
 
         self::assertCount(1, $filtered);
         self::assertSame('Alice Smith', $filtered[0]->fullName->value);
@@ -89,12 +63,10 @@ final class DoctrineJobApplicationRepositoryTest extends KernelTestCase
 
     public function testFindByCriteriaSearchesByEmail(): void
     {
-        $app1 = $this->createApplication('Alice', 'alice@example.com');
-        $app2 = $this->createApplication('Bob', 'bob@example.com');
-        $this->repository->save($app1);
-        $this->repository->save($app2);
+        $this->givenApplication('Alice', 'alice@example.com');
+        $this->givenApplication('Bob', 'bob@example.com');
 
-        $filtered = $this->repository->findByCriteria(['search' => 'bob@example.com']);
+        $filtered = $this->doctrineJobApplicationRepository()->findByCriteria(['search' => 'bob@example.com']);
 
         self::assertCount(1, $filtered);
         self::assertSame('Bob', $filtered[0]->fullName->value);
@@ -102,38 +74,23 @@ final class DoctrineJobApplicationRepositoryTest extends KernelTestCase
 
     public function testFindByCriteriaSearchIsCaseInsensitive(): void
     {
-        $app1 = $this->createApplication('Alice', 'alice@example.com');
-        $this->repository->save($app1);
+        $this->givenApplication('Alice', 'alice@example.com');
 
-        $filtered = $this->repository->findByCriteria(['search' => 'ALICE']);
+        $filtered = $this->doctrineJobApplicationRepository()->findByCriteria(['search' => 'ALICE']);
 
         self::assertCount(1, $filtered);
     }
 
     public function testFindByCriteriaReturnsNewestFirst(): void
     {
-        $app1 = $this->createApplication('First', 'first@example.com');
-        $this->repository->save($app1);
-
-        // Sleep to ensure different timestamps (PostgreSQL timestamp precision is seconds)
+        $this->givenApplication('First', 'first@example.com');
         sleep(1);
+        $this->givenApplication('Second', 'second@example.com');
 
-        $app2 = $this->createApplication('Second', 'second@example.com');
-        $this->repository->save($app2);
-
-        $filtered = $this->repository->findByCriteria([]);
+        $filtered = $this->doctrineJobApplicationRepository()->findByCriteria([]);
 
         self::assertCount(2, $filtered);
         self::assertSame('Second', $filtered[0]->fullName->value);
         self::assertSame('First', $filtered[1]->fullName->value);
-    }
-
-    private function createApplication(string $name = 'Test User', string $email = 'test@example.com', string $position = 'Developer'): \App\Application\Domain\Model\JobApplication
-    {
-        return JobApplicationMother::builder()
-            ->withName($name)
-            ->withEmail($email)
-            ->withPosition($position)
-            ->build();
     }
 }
