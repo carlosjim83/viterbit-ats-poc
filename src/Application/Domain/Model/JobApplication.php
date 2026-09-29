@@ -19,6 +19,9 @@ final class JobApplication
     /** @var list<object> */
     private array $recordedEvents = [];
 
+    public ?string $summary = null;
+    public ?int $score = null;
+
     private function __construct(
         public readonly ApplicationId $id,
         public readonly FullName $fullName,
@@ -27,7 +30,7 @@ final class JobApplication
         public readonly Position $position,
         public readonly Notes $notes,
         public readonly CVText $cvText,
-        public readonly Status $status,
+        public Status $status,
         public readonly \DateTimeImmutable $appliedAt,
     ) {
     }
@@ -71,6 +74,26 @@ final class JobApplication
         $this->recordedEvents = [];
 
         return $events;
+    }
+
+    public function requestEnrichment(): void
+    {
+        if ('received' !== $this->status->value) {
+            throw new \DomainException('Enrichment can only be requested for applications in received status.');
+        }
+
+        $this->status = Status::enriching();
+    }
+
+    public function completeEnrichment(string $summary, int $score): void
+    {
+        if ('enriching' !== $this->status->value) {
+            throw new \DomainException('Enrichment can only be completed for applications in enriching status.');
+        }
+
+        $this->summary = $summary;
+        $this->score = $score;
+        $this->status = Status::enriched();
     }
 
     private function recordEvent(object $event): void

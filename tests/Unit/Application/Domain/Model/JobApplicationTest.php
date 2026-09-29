@@ -79,6 +79,44 @@ final class JobApplicationTest extends TestCase
         self::assertCount(0, $secondPull);
     }
 
+    public function testRequestEnrichmentTransitionsStatusToEnriching(): void
+    {
+        $application = $this->submitApplication();
+
+        $application->requestEnrichment();
+
+        self::assertSame('enriching', $application->status->value);
+    }
+
+    public function testCompleteEnrichmentStoresSummaryAndScoreAndTransitionsToEnriched(): void
+    {
+        $application = $this->submitApplication();
+        $application->requestEnrichment();
+
+        $application->completeEnrichment('Great candidate for backend.', 85);
+
+        self::assertSame('enriched', $application->status->value);
+        self::assertSame('Great candidate for backend.', $application->summary);
+        self::assertSame(85, $application->score);
+    }
+
+    public function testCompleteEnrichmentRequiresEnrichingStatus(): void
+    {
+        $application = $this->submitApplication();
+
+        $this->expectException(\DomainException::class);
+        $application->completeEnrichment('Summary', 50);
+    }
+
+    public function testRequestEnrichmentRequiresReceivedStatus(): void
+    {
+        $application = $this->submitApplication();
+        $application->requestEnrichment();
+
+        $this->expectException(\DomainException::class);
+        $application->requestEnrichment();
+    }
+
     private function submitApplication(): JobApplication
     {
         return JobApplication::submit(
