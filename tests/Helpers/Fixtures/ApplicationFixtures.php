@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Application\Infrastructure\Persistence\DataFixtures;
+namespace App\Tests\Helpers\Fixtures;
 
 use App\Application\Infrastructure\Persistence\DoctrineJobApplication;
 use Doctrine\Bundle\FixturesBundle\Fixture;

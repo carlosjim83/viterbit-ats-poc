@@ -7,14 +7,8 @@ namespace App\Tests\Unit\Application\Application\Handler;
 use App\Application\Application\DTO\ApplicationDTO;
 use App\Application\Application\Handler\ListApplicationsHandler;
 use App\Application\Application\Query\ListApplications;
-use App\Application\Domain\Model\JobApplication;
-use App\Application\Domain\Model\ValueObject\CVText;
-use App\Application\Domain\Model\ValueObject\Email;
-use App\Application\Domain\Model\ValueObject\FullName;
-use App\Application\Domain\Model\ValueObject\Notes;
-use App\Application\Domain\Model\ValueObject\Phone;
-use App\Application\Domain\Model\ValueObject\Position;
 use App\Application\Domain\Repository\JobApplicationRepository;
+use App\Tests\Helpers\Mother\JobApplicationMother;
 use PHPUnit\Framework\TestCase;
 
 final class ListApplicationsHandlerTest extends TestCase
@@ -34,14 +28,11 @@ final class ListApplicationsHandlerTest extends TestCase
 
     public function testItReturnsApplicationDTOs(): void
     {
-        $application = JobApplication::submit(
-            new FullName('Ada Lovelace'),
-            new Email('ada@example.com'),
-            new Phone('+1234567890'),
-            new Position('Engineer'),
-            new Notes(''),
-            new CVText('Experienced developer'),
-        );
+        $application = JobApplicationMother::builder()
+            ->withName('Ada Lovelace')
+            ->withEmail('ada@example.com')
+            ->withPosition('Engineer')
+            ->build();
 
         $repository = $this->createMock(JobApplicationRepository::class);
         $repository->method('findByCriteria')

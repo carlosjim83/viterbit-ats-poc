@@ -119,46 +119,16 @@ final readonly class DoctrineJobApplicationRepository implements JobApplicationR
 
     private function toAggregate(DoctrineJobApplication $entity): JobApplication
     {
-        // Use reflection to reconstruct the aggregate from the entity
-        $reflection = new \ReflectionClass(JobApplication::class);
-        $instance = $reflection->newInstanceWithoutConstructor();
-
-        $idProp = $reflection->getProperty('id');
-        $idProp->setAccessible(true);
-        $idProp->setValue($instance, ApplicationId::fromString($entity->getId()));
-
-        $fullNameProp = $reflection->getProperty('fullName');
-        $fullNameProp->setAccessible(true);
-        $fullNameProp->setValue($instance, new FullName($entity->getFullName()));
-
-        $emailProp = $reflection->getProperty('email');
-        $emailProp->setAccessible(true);
-        $emailProp->setValue($instance, new Email($entity->getEmail()));
-
-        $phoneProp = $reflection->getProperty('phone');
-        $phoneProp->setAccessible(true);
-        $phoneProp->setValue($instance, new Phone($entity->getPhone()));
-
-        $positionProp = $reflection->getProperty('position');
-        $positionProp->setAccessible(true);
-        $positionProp->setValue($instance, new Position($entity->getPosition()));
-
-        $notesProp = $reflection->getProperty('notes');
-        $notesProp->setAccessible(true);
-        $notesProp->setValue($instance, new Notes($entity->getNotes() ?? ''));
-
-        $cvTextProp = $reflection->getProperty('cvText');
-        $cvTextProp->setAccessible(true);
-        $cvTextProp->setValue($instance, new CVText($entity->getCvText()));
-
-        $statusProp = $reflection->getProperty('status');
-        $statusProp->setAccessible(true);
-        $statusProp->setValue($instance, Status::fromString($entity->getStatus()));
-
-        $appliedAtProp = $reflection->getProperty('appliedAt');
-        $appliedAtProp->setAccessible(true);
-        $appliedAtProp->setValue($instance, $entity->getAppliedAt());
-
-        return $instance;
+        return JobApplication::fromPersistence(
+            ApplicationId::fromString($entity->getId()),
+            new FullName($entity->getFullName()),
+            new Email($entity->getEmail()),
+            new Phone($entity->getPhone()),
+            new Position($entity->getPosition()),
+            new Notes($entity->getNotes() ?? ''),
+            new CVText($entity->getCvText()),
+            Status::fromString($entity->getStatus()),
+            $entity->getAppliedAt(),
+        );
     }
 }

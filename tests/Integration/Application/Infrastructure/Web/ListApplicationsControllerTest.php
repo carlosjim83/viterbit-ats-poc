@@ -4,14 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Application\Infrastructure\Web;
 
-use App\Application\Domain\Model\JobApplication;
-use App\Application\Domain\Model\ValueObject\CVText;
-use App\Application\Domain\Model\ValueObject\Email;
-use App\Application\Domain\Model\ValueObject\FullName;
-use App\Application\Domain\Model\ValueObject\Notes;
-use App\Application\Domain\Model\ValueObject\Phone;
-use App\Application\Domain\Model\ValueObject\Position;
 use App\Application\Infrastructure\Persistence\DoctrineJobApplicationRepository;
+use App\Tests\Helpers\Mother\JobApplicationMother;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -100,14 +94,11 @@ final class ListApplicationsControllerTest extends WebTestCase
         $em = self::getContainer()->get(EntityManagerInterface::class);
         $repository = new DoctrineJobApplicationRepository($em);
 
-        $application = JobApplication::submit(
-            new FullName($name),
-            new Email($email),
-            new Phone('+1234567890'),
-            new Position($position),
-            new Notes(''),
-            new CVText('Experience'),
-        );
+        $application = JobApplicationMother::builder()
+            ->withName($name)
+            ->withEmail($email)
+            ->withPosition($position)
+            ->build();
 
         $repository->save($application);
     }

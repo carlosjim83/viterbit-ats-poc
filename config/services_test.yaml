@@ -1,0 +1,5 @@
+services:
+    App\Tests\Helpers\Fixtures\:
+        resource: '../tests/Helpers/Fixtures/'
+        autowire: true
+        autoconfigure: true

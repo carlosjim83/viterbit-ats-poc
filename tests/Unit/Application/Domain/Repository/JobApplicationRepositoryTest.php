@@ -6,13 +6,8 @@ namespace App\Tests\Unit\Application\Domain\Repository;
 
 use App\Application\Domain\Model\JobApplication;
 use App\Application\Domain\Model\ValueObject\ApplicationId;
-use App\Application\Domain\Model\ValueObject\CVText;
-use App\Application\Domain\Model\ValueObject\Email;
-use App\Application\Domain\Model\ValueObject\FullName;
-use App\Application\Domain\Model\ValueObject\Notes;
-use App\Application\Domain\Model\ValueObject\Phone;
-use App\Application\Domain\Model\ValueObject\Position;
 use App\Application\Domain\Repository\JobApplicationRepository;
+use App\Tests\Helpers\Mother\JobApplicationMother;
 use PHPUnit\Framework\TestCase;
 
 final class JobApplicationRepositoryTest extends TestCase
@@ -143,14 +138,11 @@ final class JobApplicationRepositoryTest extends TestCase
 
     private function createApplication(string $name = 'Test User', string $email = 'test@example.com', string $position = 'Developer'): JobApplication
     {
-        return JobApplication::submit(
-            new FullName($name),
-            new Email($email),
-            new Phone('+1234567890'),
-            new Position($position),
-            new Notes(''),
-            new CVText('Some experience'),
-        );
+        return JobApplicationMother::builder()
+            ->withName($name)
+            ->withEmail($email)
+            ->withPosition($position)
+            ->build();
     }
 }
 

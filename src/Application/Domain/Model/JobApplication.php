@@ -50,6 +50,20 @@ final class JobApplication
         return $application;
     }
 
+    public static function fromPersistence(
+        ApplicationId $id,
+        FullName $fullName,
+        Email $email,
+        Phone $phone,
+        Position $position,
+        Notes $notes,
+        CVText $cvText,
+        Status $status,
+        \DateTimeImmutable $appliedAt,
+    ): self {
+        return new self($id, $fullName, $email, $phone, $position, $notes, $cvText, $status, $appliedAt);
+    }
+
     /** @return list<object> */
     public function events(): array
     {
