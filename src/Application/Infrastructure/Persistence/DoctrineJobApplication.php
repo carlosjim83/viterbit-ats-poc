@@ -36,6 +36,12 @@ final class DoctrineJobApplication
     #[ORM\Column(type: Types::STRING, length: 20)]
     private string $status;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $summary = null;
+
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    private ?int $score = null;
+
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private \DateTimeImmutable $appliedAt;
 
@@ -144,5 +150,25 @@ final class DoctrineJobApplication
     public function setAppliedAt(\DateTimeImmutable $appliedAt): void
     {
         $this->appliedAt = $appliedAt;
+    }
+
+    public function getSummary(): ?string
+    {
+        return $this->summary;
+    }
+
+    public function setSummary(?string $summary): void
+    {
+        $this->summary = $summary;
+    }
+
+    public function getScore(): ?int
+    {
+        return $this->score;
+    }
+
+    public function setScore(?int $score): void
+    {
+        $this->score = $score;
     }
 }
