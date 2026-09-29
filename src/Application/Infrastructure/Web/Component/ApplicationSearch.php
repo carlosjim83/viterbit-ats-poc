@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Twig\Components;
+namespace App\Application\Infrastructure\Web\Component;
 
 use App\Application\Application\Query\ListApplications\ListApplications;
 use Ecotone\Modelling\QueryBus;
