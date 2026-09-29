@@ -109,6 +109,21 @@ make sh            # Open shell in PHP container
 
 PHP-CS-Fixer, PHPStan, and Deptrac must be configured from minute zero and must pass before any commit. No custom validation scripts are used; the existing linting and testing toolchain is the single source of truth.
 
+A pre-commit hook runs all quality gates automatically. Install it with `make install-hooks`.
+
+## Skills
+
+Personal skills for this project live in `.claude/skills/` (not committed to git). They cover:
+
+- **tdd-workflow** — Red-Green-Refactor rules
+- **hexagonal-contexts** — Folder structure and dependency direction
+- **docker-only** — Container-based command execution
+- **atomic-commits** — Commit discipline
+- **domain-driven-design** — Value Objects, Aggregates, Events
+- **cqrs-pattern** — Command/Query separation
+- **async-messaging** — Ecotone async handlers and testing
+- **repository-pattern** — Repository interface + Doctrine implementation
+
 ## ADRs
 
 All architectural decisions are documented as Architecture Decision Records in `docs/adr/`.
