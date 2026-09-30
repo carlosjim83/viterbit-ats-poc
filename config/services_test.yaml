@@ -1,5 +1,8 @@
 services:
-    App\Tests\Helpers\Fixtures\:
-        resource: '../tests/Helpers/Fixtures/'
+    _defaults:
         autowire: true
         autoconfigure: true
+
+    App\Tests\Behat\:
+        resource: '../tests/Behat/*'
+
