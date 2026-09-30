@@ -12,7 +12,9 @@ Feature: Application submission and enrichment flow
       | position | Engineering Manager                                             |
       | notes    | Remote only                                                     |
       | cvText   | Pioneer of computer science with extensive analytical experience. |
-    And the enrichment process runs
+    Then the response status code should be 200
+    And I should see "Application Submitted"
+    When the enrichment process runs
     And I am on "/applications"
     Then I should see "Ada Lovelace"
     And I should see "Engineering Manager"

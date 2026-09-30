@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Behat;
 
-use App\Application\Application\Command\SubmitApplication\SubmitApplication;
-use App\Application\Application\Command\SubmitApplication\SubmitApplicationHandler;
-use App\Application\Application\Event\Enrichment\EnrichmentHandler;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Hook\BeforeScenario;
@@ -14,9 +11,8 @@ use Behat\Step\Given;
 use Behat\Step\Then;
 use Behat\Step\When;
 use Doctrine\ORM\EntityManagerInterface;
-use Ecotone\Lite\EcotoneLite;
-use Ecotone\Lite\Test\FlowTestSupport;
-use Ecotone\Messaging\Channel\SimpleMessageChannelBuilder;
+use Ecotone\Messaging\Config\ConfiguredMessagingSystem;
+use Ecotone\Messaging\Endpoint\ExecutionPollingMetadata;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -26,7 +22,6 @@ final class FeatureContext implements Context
     private KernelInterface $kernel;
     private EntityManagerInterface $em;
     private ?Response $lastResponse = null;
-    private ?FlowTestSupport $ecotone = null;
 
     public function __construct(KernelInterface $kernel, EntityManagerInterface $em)
     {
@@ -39,6 +34,12 @@ final class FeatureContext implements Context
     {
         $conn = $this->em->getConnection();
         $conn->executeStatement('DELETE FROM job_applications');
+
+        try {
+            $conn->executeStatement('DELETE FROM messenger_messages');
+        } catch (\Doctrine\DBAL\Exception\TableNotFoundException) {
+            // Table may not exist yet if messenger auto_setup is disabled
+        }
     }
 
     #[Given('I am on :path')]
@@ -53,24 +54,27 @@ final class FeatureContext implements Context
         /** @var array<string, string> $data */
         $data = $table->getRowsHash();
 
-        $command = new SubmitApplication(
-            $data['fullName'],
-            $data['email'],
-            $data['phone'],
-            $data['position'],
-            $data['notes'] ?? '',
-            $data['cvText'],
-        );
-
-        $ecotone = $this->bootstrapEcotone();
-        $ecotone->sendCommandWithRoutingKey('application.submit', $command);
+        $this->lastResponse = $this->kernel->handle(Request::create(
+            '/apply',
+            'POST',
+            [
+                'fullName' => $data['fullName'],
+                'email' => $data['email'],
+                'phone' => $data['phone'],
+                'position' => $data['position'],
+                'notes' => $data['notes'] ?? '',
+                'cvText' => $data['cvText'],
+            ]
+        ));
     }
 
     #[When('the enrichment process runs')]
     public function theEnrichmentProcessRuns(): void
     {
-        $ecotone = $this->bootstrapEcotone();
-        $ecotone->run('enrichment');
+        $container = $this->kernel->getContainer();
+        /** @var ConfiguredMessagingSystem $messaging */
+        $messaging = $container->get(ConfiguredMessagingSystem::class);
+        $messaging->run('enrichment', ExecutionPollingMetadata::createWithFinishWhenNoMessages());
     }
 
     #[Then('I should see :text')]
@@ -135,27 +139,5 @@ final class FeatureContext implements Context
         }
 
         return $this->lastResponse;
-    }
-
-    private function bootstrapEcotone(): FlowTestSupport
-    {
-        if (null === $this->ecotone) {
-            $container = $this->kernel->getContainer();
-
-            $this->ecotone = EcotoneLite::bootstrapFlowTesting(
-                classesToResolve: [
-                    SubmitApplicationHandler::class,
-                    EnrichmentHandler::class,
-                    \App\Application\Application\Query\ListApplications\ListApplicationsHandler::class,
-                    \App\Application\Application\Query\GetApplicationDetail\GetApplicationDetailHandler::class,
-                ],
-                containerOrAvailableServices: $container,
-                enableAsynchronousProcessing: [
-                    SimpleMessageChannelBuilder::createQueueChannel('enrichment'),
-                ],
-            );
-        }
-
-        return $this->ecotone;
     }
 }
