@@ -63,8 +63,14 @@ final class JobApplication
         CVText $cvText,
         Status $status,
         \DateTimeImmutable $appliedAt,
+        ?string $summary = null,
+        ?int $score = null,
     ): self {
-        return new self($id, $fullName, $email, $phone, $position, $notes, $cvText, $status, $appliedAt);
+        $application = new self($id, $fullName, $email, $phone, $position, $notes, $cvText, $status, $appliedAt);
+        $application->summary = $summary;
+        $application->score = $score;
+
+        return $application;
     }
 
     public function requestEnrichment(): void

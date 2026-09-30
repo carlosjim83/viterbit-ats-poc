@@ -133,7 +133,7 @@ final readonly class DoctrineJobApplicationRepository implements JobApplicationR
 
     private function toAggregate(DoctrineJobApplication $entity): JobApplication
     {
-        $application = JobApplication::fromPersistence(
+        return JobApplication::fromPersistence(
             ApplicationId::fromString($entity->getId()),
             new FullName($entity->getFullName()),
             new Email($entity->getEmail()),
@@ -143,11 +143,8 @@ final readonly class DoctrineJobApplicationRepository implements JobApplicationR
             new CVText($entity->getCvText()),
             Status::fromString($entity->getStatus()),
             $entity->getAppliedAt(),
+            $entity->getSummary(),
+            $entity->getScore(),
         );
-
-        $application->summary = $entity->getSummary();
-        $application->score = $entity->getScore();
-
-        return $application;
     }
 }
