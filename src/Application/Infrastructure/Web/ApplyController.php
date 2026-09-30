@@ -6,18 +6,19 @@ namespace App\Application\Infrastructure\Web;
 
 use App\Application\Application\Command\SubmitApplication\SubmitApplication;
 use App\Application\Domain\Exception\DuplicateEmailException;
+use App\Application\Infrastructure\Web\Form\ApplyType;
 use Ecotone\Modelling\CommandBus;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Twig\Environment;
 
 final readonly class ApplyController
 {
     public function __construct(
         private CommandBus $commandBus,
-        private CsrfTokenManagerInterface $csrfTokenManager,
+        private FormFactoryInterface $formFactory,
         private Environment $twig,
     ) {
     }
@@ -25,74 +26,37 @@ final readonly class ApplyController
     #[Route('/apply', name: 'apply', methods: ['GET', 'POST'])]
     public function __invoke(Request $request): Response
     {
-        $errors = [];
-        $data = [
-            'fullName' => '',
-            'email' => '',
-            'phone' => '',
-            'position' => '',
-            'notes' => '',
-            'cvText' => '',
-        ];
+        $form = $this->formFactory->create(ApplyType::class);
+        $form->handleRequest($request);
 
-        if ($request->isMethod('POST')) {
-            $token = (string) $request->request->get('_token', '');
-            if (!$this->csrfTokenManager->isTokenValid(new \Symfony\Component\Security\Csrf\CsrfToken('apply', $token))) {
-                throw new \Symfony\Component\HttpKernel\Exception\HttpException(Response::HTTP_FORBIDDEN, 'Invalid CSRF token.');
-            }
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var array<string, string> $data */
+            $data = $form->getData();
 
-            $data = [
-                'fullName' => (string) $request->request->get('fullName', ''),
-                'email' => (string) $request->request->get('email', ''),
-                'phone' => (string) $request->request->get('phone', ''),
-                'position' => (string) $request->request->get('position', ''),
-                'notes' => (string) $request->request->get('notes', ''),
-                'cvText' => (string) $request->request->get('cvText', ''),
-            ];
+            try {
+                $command = new SubmitApplication(
+                    $data['fullName'],
+                    $data['email'],
+                    $data['phone'],
+                    $data['position'],
+                    $data['notes'] ?? '',
+                    $data['cvText'],
+                );
 
-            if ('' === trim($data['fullName'])) {
-                $errors['fullName'] = 'Full name is required.';
-            }
-            if ('' === trim($data['email']) || !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-                $errors['email'] = 'A valid email is required.';
-            }
-            if ('' === trim($data['phone'])) {
-                $errors['phone'] = 'Phone is required.';
-            }
-            if ('' === trim($data['position'])) {
-                $errors['position'] = 'Position is required.';
-            }
-            if ('' === trim($data['cvText'])) {
-                $errors['cvText'] = 'CV text is required.';
-            }
+                $this->commandBus->sendWithRouting('application.submit', $command);
 
-            if ([] === $errors) {
-                try {
-                    $command = new SubmitApplication(
-                        $data['fullName'],
-                        $data['email'],
-                        $data['phone'],
-                        $data['position'],
-                        $data['notes'],
-                        $data['cvText'],
-                    );
-
-                    $this->commandBus->sendWithRouting('application.submit', $command);
-
-                    return new Response(
-                        $this->twig->render('application/apply_success.html.twig'),
-                        Response::HTTP_OK,
-                    );
-                } catch (DuplicateEmailException $e) {
-                    $errors['email'] = 'An application with this email already exists.';
-                }
+                return new Response(
+                    $this->twig->render('application/apply_success.html.twig'),
+                    Response::HTTP_OK,
+                );
+            } catch (DuplicateEmailException $e) {
+                $form->get('email')->addError(new \Symfony\Component\Form\FormError('An application with this email already exists.'));
             }
         }
 
         return new Response(
             $this->twig->render('application/apply.html.twig', [
-                'data' => $data,
-                'errors' => $errors,
+                'form' => $form->createView(),
             ]),
             Response::HTTP_OK,
         );
