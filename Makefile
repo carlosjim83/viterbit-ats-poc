@@ -1,7 +1,7 @@
 # Viterbit ATS PoC — Docker-based Makefile
 # No commands should run directly on the host; always use `make <target>`.
 
-.PHONY: init up down build test test-unit test-integration cs-fix stan deptrac lint sh validate install-hooks
+.PHONY: init up down build test test-unit test-integration behat cs-fix stan deptrac lint sh validate install-hooks
 
 # ---------------------------------------------------------------------------
 # Lifecycle
@@ -49,11 +49,14 @@ test-unit:
 test-integration:
 	docker compose exec php php vendor/bin/phpunit --testsuite integration
 
+behat:
+	docker compose exec -e APP_ENV=test php vendor/bin/behat --format=progress
+
 # ---------------------------------------------------------------------------
 # Validation (all quality gates)
 # ---------------------------------------------------------------------------
 
-validate: lint test
+validate: lint test behat
 
 # ---------------------------------------------------------------------------
 # Git Hooks
