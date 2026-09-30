@@ -10,22 +10,31 @@ use App\Application\Application\Query\GetApplicationDetail\GetApplicationDetailH
 use App\Application\Domain\Model\ValueObject\ApplicationId;
 use App\Application\Domain\Repository\JobApplicationRepository;
 use App\Tests\Helpers\Mother\JobApplicationMother;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 final class GetApplicationDetailHandlerTest extends TestCase
 {
+    /** @var JobApplicationRepository&MockObject */
+    private JobApplicationRepository $repository;
+
+    private GetApplicationDetailHandler $handler;
+
+    protected function setUp(): void
+    {
+        $this->repository = $this->createMock(JobApplicationRepository::class);
+        $this->handler = new GetApplicationDetailHandler($this->repository);
+    }
+
     public function testItReturnsDetailDtoWhenApplicationExists(): void
     {
-        $repository = $this->createMock(JobApplicationRepository::class);
-        $handler = new GetApplicationDetailHandler($repository);
-
         $application = JobApplicationMother::create();
 
-        $repository->method('findById')
+        $this->repository->method('findById')
             ->with($this->equalTo($application->id))
             ->willReturn($application);
 
-        $dto = $handler->handle(new GetApplicationDetail((string) $application->id));
+        $dto = $this->handler->handle(new GetApplicationDetail((string) $application->id));
 
         self::assertInstanceOf(ApplicationDetailDTO::class, $dto);
         self::assertSame((string) $application->id, $dto->id);
@@ -40,14 +49,11 @@ final class GetApplicationDetailHandlerTest extends TestCase
 
     public function testItReturnsNullWhenApplicationDoesNotExist(): void
     {
-        $repository = $this->createMock(JobApplicationRepository::class);
-        $handler = new GetApplicationDetailHandler($repository);
-
-        $repository->method('findById')
+        $this->repository->method('findById')
             ->with($this->equalTo(ApplicationId::fromString('550e8400-e29b-41d4-a716-446655440000')))
             ->willReturn(null);
 
-        $dto = $handler->handle(new GetApplicationDetail('550e8400-e29b-41d4-a716-446655440000'));
+        $dto = $this->handler->handle(new GetApplicationDetail('550e8400-e29b-41d4-a716-446655440000'));
 
         self::assertNull($dto);
     }

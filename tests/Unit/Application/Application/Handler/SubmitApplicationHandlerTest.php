@@ -10,21 +10,39 @@ use App\Application\Domain\Event\ApplicationSubmitted;
 use App\Application\Domain\Event\EnrichmentRequested;
 use App\Application\Domain\Model\JobApplication;
 use App\Application\Domain\Model\ValueObject\ApplicationId;
+use App\Application\Domain\Model\ValueObject\CVText;
 use App\Application\Domain\Model\ValueObject\Email;
+use App\Application\Domain\Model\ValueObject\FullName;
+use App\Application\Domain\Model\ValueObject\Notes;
+use App\Application\Domain\Model\ValueObject\Phone;
+use App\Application\Domain\Model\ValueObject\Position;
 use App\Application\Domain\Repository\JobApplicationRepository;
 use App\Shared\Domain\EventBus;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 final class SubmitApplicationHandlerTest extends TestCase
 {
+    /** @var JobApplicationRepository&MockObject */
+    private JobApplicationRepository $repository;
+
+    /** @var EventBus&MockObject */
+    private EventBus $eventBus;
+
+    private SubmitApplicationHandler $handler;
+
+    protected function setUp(): void
+    {
+        $this->repository = $this->createMock(JobApplicationRepository::class);
+        $this->eventBus = $this->createMock(EventBus::class);
+        $this->handler = new SubmitApplicationHandler($this->repository, $this->eventBus);
+    }
+
     public function testHandleCreatesAndSavesApplication(): void
     {
-        $repository = $this->createMock(JobApplicationRepository::class);
-        $eventBus = $this->createMock(EventBus::class);
+        $this->repository->method('findByEmail')->willReturn(null);
 
-        $repository->method('findByEmail')->willReturn(null);
-
-        $repository->expects(self::once())
+        $this->repository->expects(self::once())
             ->method('save')
             ->with(self::callback(static function (JobApplication $app): bool {
                 return 'Test User' === $app->fullName->value
@@ -37,13 +55,12 @@ final class SubmitApplicationHandlerTest extends TestCase
             }));
 
         $publishedEvents = [];
-        $eventBus->expects(self::exactly(2))
+        $this->eventBus->expects(self::exactly(2))
             ->method('publish')
             ->willReturnCallback(static function ($event) use (&$publishedEvents): void {
                 $publishedEvents[] = $event;
             });
 
-        $handler = new SubmitApplicationHandler($repository, $eventBus);
         $command = new SubmitApplication(
             'Test User',
             'test@example.com',
@@ -53,7 +70,7 @@ final class SubmitApplicationHandlerTest extends TestCase
             'Some CV text',
         );
 
-        $id = $handler->handle($command);
+        $id = $this->handler->handle($command);
 
         self::assertInstanceOf(ApplicationId::class, $id);
         self::assertCount(2, $publishedEvents);
@@ -65,23 +82,20 @@ final class SubmitApplicationHandlerTest extends TestCase
     public function testHandleRejectsDuplicateEmail(): void
     {
         $existing = JobApplication::submit(
-            new \App\Application\Domain\Model\ValueObject\FullName('Existing'),
+            new FullName('Existing'),
             new Email('duplicate@example.com'),
-            new \App\Application\Domain\Model\ValueObject\Phone('+1111111111'),
-            new \App\Application\Domain\Model\ValueObject\Position('Dev'),
-            new \App\Application\Domain\Model\ValueObject\Notes(''),
-            new \App\Application\Domain\Model\ValueObject\CVText('Existing CV'),
+            new Phone('+1111111111'),
+            new Position('Dev'),
+            new Notes(''),
+            new CVText('Existing CV'),
         );
 
-        $repository = $this->createMock(JobApplicationRepository::class);
-        $repository->method('findByEmail')
+        $this->repository->method('findByEmail')
             ->with(self::callback(static fn (Email $email): bool => 'duplicate@example.com' === $email->value))
             ->willReturn($existing);
 
-        $eventBus = $this->createMock(EventBus::class);
-        $eventBus->expects(self::never())->method('publish');
+        $this->eventBus->expects(self::never())->method('publish');
 
-        $handler = new SubmitApplicationHandler($repository, $eventBus);
         $command = new SubmitApplication(
             'Test User',
             'duplicate@example.com',
@@ -94,6 +108,6 @@ final class SubmitApplicationHandlerTest extends TestCase
         $this->expectException(\DomainException::class);
         $this->expectExceptionMessage('An application with this email already exists.');
 
-        $handler->handle($command);
+        $this->handler->handle($command);
     }
 }

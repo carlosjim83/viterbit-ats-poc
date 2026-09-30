@@ -13,15 +13,24 @@ use PHPUnit\Framework\TestCase;
 
 final class ListApplicationsHandlerTest extends TestCase
 {
+    /** @var JobApplicationRepository&\PHPUnit\Framework\MockObject\MockObject */
+    private JobApplicationRepository $repository;
+
+    private ListApplicationsHandler $handler;
+
+    protected function setUp(): void
+    {
+        $this->repository = $this->createMock(JobApplicationRepository::class);
+        $this->handler = new ListApplicationsHandler($this->repository);
+    }
+
     public function testItReturnsEmptyArrayWhenNoApplications(): void
     {
-        $repository = $this->createMock(JobApplicationRepository::class);
-        $repository->method('findByCriteria')
+        $this->repository->method('findByCriteria')
             ->with(['status' => 'received'])
             ->willReturn([]);
 
-        $handler = new ListApplicationsHandler($repository);
-        $result = $handler->handle(new ListApplications(status: 'received'));
+        $result = $this->handler->handle(new ListApplications(status: 'received'));
 
         self::assertSame([], $result);
     }
@@ -34,13 +43,11 @@ final class ListApplicationsHandlerTest extends TestCase
             ->withPosition('Engineer')
             ->build();
 
-        $repository = $this->createMock(JobApplicationRepository::class);
-        $repository->method('findByCriteria')
+        $this->repository->method('findByCriteria')
             ->with([])
             ->willReturn([$application]);
 
-        $handler = new ListApplicationsHandler($repository);
-        $result = $handler->handle(new ListApplications());
+        $result = $this->handler->handle(new ListApplications());
 
         self::assertCount(1, $result);
         self::assertInstanceOf(ApplicationDTO::class, $result[0]);
@@ -53,8 +60,7 @@ final class ListApplicationsHandlerTest extends TestCase
 
     public function testItPassesAllCriteriaToRepository(): void
     {
-        $repository = $this->createMock(JobApplicationRepository::class);
-        $repository->expects(self::once())
+        $this->repository->expects(self::once())
             ->method('findByCriteria')
             ->with([
                 'status' => 'enriched',
@@ -63,8 +69,7 @@ final class ListApplicationsHandlerTest extends TestCase
             ])
             ->willReturn([]);
 
-        $handler = new ListApplicationsHandler($repository);
-        $result = $handler->handle(new ListApplications(
+        $result = $this->handler->handle(new ListApplications(
             status: 'enriched',
             position: 'Manager',
             search: 'Ada',
@@ -83,13 +88,11 @@ final class ListApplicationsHandlerTest extends TestCase
         $application->requestEnrichment();
         $application->completeEnrichment('Great candidate', 95);
 
-        $repository = $this->createMock(JobApplicationRepository::class);
-        $repository->method('findByCriteria')
+        $this->repository->method('findByCriteria')
             ->with([])
             ->willReturn([$application]);
 
-        $handler = new ListApplicationsHandler($repository);
-        $result = $handler->handle(new ListApplications());
+        $result = $this->handler->handle(new ListApplications());
 
         self::assertCount(1, $result);
         self::assertSame(95, $result[0]->score);
@@ -97,14 +100,12 @@ final class ListApplicationsHandlerTest extends TestCase
 
     public function testItIgnoresEmptyCriteria(): void
     {
-        $repository = $this->createMock(JobApplicationRepository::class);
-        $repository->expects(self::once())
+        $this->repository->expects(self::once())
             ->method('findByCriteria')
             ->with([])
             ->willReturn([]);
 
-        $handler = new ListApplicationsHandler($repository);
-        $result = $handler->handle(new ListApplications(
+        $result = $this->handler->handle(new ListApplications(
             status: '',
             position: '',
             search: '',
