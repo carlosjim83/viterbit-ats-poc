@@ -106,7 +106,7 @@ final class SubmitApplicationHandlerTest extends TestCase
         );
 
         $this->expectException(\DomainException::class);
-        $this->expectExceptionMessage('An application with this email already exists.');
+        $this->expectExceptionMessage('An application with email duplicate@example.com already exists.');
 
         $this->handler->handle($command);
     }

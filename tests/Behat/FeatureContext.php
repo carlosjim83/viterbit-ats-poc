@@ -15,19 +15,22 @@ use Doctrine\ORM\EntityManagerInterface;
 use Ecotone\Messaging\Config\ConfiguredMessagingSystem;
 use Ecotone\Messaging\Endpoint\ExecutionPollingMetadata;
 use Ecotone\Modelling\CommandBus;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\HttpKernelBrowser;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 final class FeatureContext implements Context
 {
+    private HttpKernelBrowser $client;
     private KernelInterface $kernel;
     private EntityManagerInterface $em;
     private ?Response $lastResponse = null;
+    private ?string $csrfToken = null;
 
     public function __construct(KernelInterface $kernel, EntityManagerInterface $em)
     {
         $this->kernel = $kernel;
+        $this->client = new HttpKernelBrowser($kernel);
         $this->em = $em;
     }
 
@@ -47,7 +50,17 @@ final class FeatureContext implements Context
     #[Given('I am on :path')]
     public function iAmOn(string $path): void
     {
-        $this->lastResponse = $this->kernel->handle(Request::create($path));
+        $this->client->request('GET', $path);
+        $this->lastResponse = $this->client->getResponse();
+        $this->extractCsrfToken();
+    }
+
+    private function extractCsrfToken(): void
+    {
+        $content = (string) $this->lastResponse?->getContent();
+        if (preg_match('/<input[^>]*name="_token"[^>]*value="([^"]+)"/', $content, $matches)) {
+            $this->csrfToken = $matches[1];
+        }
     }
 
     #[Given('an application exists with:')]
@@ -74,18 +87,17 @@ final class FeatureContext implements Context
         /** @var array<string, string> $data */
         $data = $table->getRowsHash();
 
-        $this->lastResponse = $this->kernel->handle(Request::create(
-            '/apply',
-            'POST',
-            [
-                'fullName' => $data['fullName'],
-                'email' => $data['email'],
-                'phone' => $data['phone'],
-                'position' => $data['position'],
-                'notes' => $data['notes'] ?? '',
-                'cvText' => $data['cvText'],
-            ]
-        ));
+        $this->client->request('POST', '/apply', [
+            'fullName' => $data['fullName'],
+            'email' => $data['email'],
+            'phone' => $data['phone'],
+            'position' => $data['position'],
+            'notes' => $data['notes'] ?? '',
+            'cvText' => $data['cvText'],
+            '_token' => $this->csrfToken ?? '',
+        ]);
+
+        $this->lastResponse = $this->client->getResponse();
     }
 
     #[When('the enrichment process runs')]
@@ -112,19 +124,22 @@ final class FeatureContext implements Context
     #[When('I am on :path with position :position')]
     public function iAmOnWithPosition(string $path, string $position): void
     {
-        $this->lastResponse = $this->kernel->handle(Request::create($path.'?position='.urlencode($position)));
+        $this->client->request('GET', $path.'?position='.urlencode($position));
+        $this->lastResponse = $this->client->getResponse();
     }
 
     #[When('I am on :path with search :search')]
     public function iAmOnWithSearch(string $path, string $search): void
     {
-        $this->lastResponse = $this->kernel->handle(Request::create($path.'?search='.urlencode($search)));
+        $this->client->request('GET', $path.'?search='.urlencode($search));
+        $this->lastResponse = $this->client->getResponse();
     }
 
     #[When('I am on :path with status :status')]
     public function iAmOnWithStatus(string $path, string $status): void
     {
-        $this->lastResponse = $this->kernel->handle(Request::create($path.'?status='.urlencode($status)));
+        $this->client->request('GET', $path.'?status='.urlencode($status));
+        $this->lastResponse = $this->client->getResponse();
     }
 
     #[Then('I should see :text')]
@@ -163,7 +178,8 @@ final class FeatureContext implements Context
         if (!is_string($id)) {
             throw new \RuntimeException(sprintf('No application found for email %s.', $email));
         }
-        $this->lastResponse = $this->kernel->handle(Request::create('/applications/'.$id));
+        $this->client->request('GET', '/applications/'.$id);
+        $this->lastResponse = $this->client->getResponse();
     }
 
     #[Then('I should see a summary')]

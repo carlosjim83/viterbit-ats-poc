@@ -27,6 +27,11 @@ final class ApplyControllerTest extends WebDatabaseTestCase
     {
         $client = static::createClient();
 
+        $client->request('GET', '/apply');
+        self::assertResponseIsSuccessful();
+
+        $token = $client->getCrawler()->filter('input[name="_token"]')->attr('value');
+
         $client->request('POST', '/apply', [
             'fullName' => 'Alice Smith',
             'email' => 'alice@example.com',
@@ -34,6 +39,7 @@ final class ApplyControllerTest extends WebDatabaseTestCase
             'position' => 'Engineering Manager',
             'notes' => 'Remote only',
             'cvText' => '10 years of experience in software engineering',
+            '_token' => $token,
         ]);
 
         self::assertResponseIsSuccessful();
@@ -50,6 +56,12 @@ final class ApplyControllerTest extends WebDatabaseTestCase
     public function testSubmitWithMissingFieldsShowsErrors(): void
     {
         $client = static::createClient();
+
+        $client->request('GET', '/apply');
+        self::assertResponseIsSuccessful();
+
+        $token = $client->getCrawler()->filter('input[name="_token"]')->attr('value');
+
         $client->request('POST', '/apply', [
             'fullName' => '',
             'email' => 'not-an-email',
@@ -57,6 +69,7 @@ final class ApplyControllerTest extends WebDatabaseTestCase
             'position' => '',
             'notes' => '',
             'cvText' => '',
+            '_token' => $token,
         ]);
 
         self::assertResponseIsSuccessful();

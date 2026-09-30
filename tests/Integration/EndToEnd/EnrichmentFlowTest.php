@@ -12,6 +12,11 @@ final class EnrichmentFlowTest extends WebDatabaseTestCase
     {
         $client = static::createClient();
 
+        $client->request('GET', '/apply');
+        self::assertResponseIsSuccessful();
+
+        $token = $client->getCrawler()->filter('input[name="_token"]')->attr('value');
+
         $client->request('POST', '/apply', [
             'fullName' => 'Ada Lovelace',
             'email' => 'ada@example.com',
@@ -19,6 +24,7 @@ final class EnrichmentFlowTest extends WebDatabaseTestCase
             'position' => 'Engineering Manager',
             'notes' => 'Remote only',
             'cvText' => '10 years of experience in software engineering with PHP and Python',
+            '_token' => $token,
         ]);
 
         self::assertResponseIsSuccessful();
