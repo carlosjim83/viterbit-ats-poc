@@ -17,7 +17,7 @@ final readonly class MockLLMClient implements LLMClientInterface
             implode(', ', $keywords) ?: 'general skills'
         );
 
-        $score = $this->calculateScore($cvText);
+        $score = $this->calculateScore($cvText, $position);
 
         return [
             'summary' => $summary,
@@ -42,8 +42,43 @@ final readonly class MockLLMClient implements LLMClientInterface
         return $found;
     }
 
-    private function calculateScore(string $cvText): int
+    private function calculateScore(string $cvText, string $position): int
     {
-        return min(100, (int) round(sqrt(strlen($cvText)) * 5));
+        $baseScore = min(60, (int) round(sqrt(strlen($cvText)) * 4));
+
+        $positionKeywords = $this->extractPositionKeywords($position);
+        $matchCount = 0;
+        foreach ($positionKeywords as $keyword) {
+            if (false !== stripos($cvText, $keyword)) {
+                ++$matchCount;
+            }
+        }
+
+        $relevanceBonus = count($positionKeywords) > 0
+            ? (int) round(($matchCount / count($positionKeywords)) * 40)
+            : 0;
+
+        return min(100, $baseScore + $relevanceBonus);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function extractPositionKeywords(string $position): array
+    {
+        $normalized = strtolower($position);
+        $keywords = [];
+
+        if (false !== strpos($normalized, 'engineer') || false !== strpos($normalized, 'developer')) {
+            $keywords = array_merge($keywords, ['php', 'python', 'javascript', 'symfony', 'react', 'docker', 'aws', 'sql', 'typescript']);
+        }
+        if (false !== strpos($normalized, 'manager') || false !== strpos($normalized, 'lead')) {
+            $keywords = array_merge($keywords, ['leadership', 'team', 'agile', 'scrum', 'management', 'strategy']);
+        }
+        if (false !== strpos($normalized, 'data') || false !== strpos($normalized, 'analyst')) {
+            $keywords = array_merge($keywords, ['python', 'sql', 'aws', 'machine learning', 'statistics']);
+        }
+
+        return array_values(array_unique($keywords));
     }
 }

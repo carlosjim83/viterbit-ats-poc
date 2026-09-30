@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Application\Command\SubmitApplication;
 
 use App\Application\Domain\Event\EnrichmentRequested;
+use App\Application\Domain\Exception\DuplicateEmailException;
 use App\Application\Domain\Model\JobApplication;
 use App\Application\Domain\Model\ValueObject\ApplicationId;
 use App\Application\Domain\Model\ValueObject\CVText;
@@ -31,7 +32,7 @@ final readonly class SubmitApplicationHandler
         $email = new Email($command->email);
 
         if (null !== $this->repository->findByEmail($email)) {
-            throw new \DomainException('An application with this email already exists.');
+            throw new DuplicateEmailException($command->email);
         }
 
         $application = JobApplication::submit(
