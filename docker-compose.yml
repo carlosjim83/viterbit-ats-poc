@@ -52,7 +52,7 @@ services:
     working_dir: /app
     environment:
       - APP_ENV=dev
-      - APP_DEBUG=1
+      - APP_DEBUG=0
     volumes:
       - .:/app:cached
       - ./docker/php/conf.d/memory-limit.ini:/usr/local/etc/php/conf.d/memory-limit.ini:ro
