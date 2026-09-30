@@ -5,16 +5,19 @@ declare(strict_types=1);
 namespace App\Application\Infrastructure\Web;
 
 use App\Application\Application\Command\SubmitApplication\SubmitApplication;
+use App\Application\Domain\Exception\DuplicateEmailException;
 use Ecotone\Modelling\CommandBus;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Twig\Environment;
 
 final readonly class ApplyController
 {
     public function __construct(
         private CommandBus $commandBus,
+        private CsrfTokenManagerInterface $csrfTokenManager,
         private Environment $twig,
     ) {
     }
@@ -33,6 +36,11 @@ final readonly class ApplyController
         ];
 
         if ($request->isMethod('POST')) {
+            $token = (string) $request->request->get('_token', '');
+            if (!$this->csrfTokenManager->isTokenValid(new \Symfony\Component\Security\Csrf\CsrfToken('apply', $token))) {
+                throw new \Symfony\Component\HttpKernel\Exception\HttpException(Response::HTTP_FORBIDDEN, 'Invalid CSRF token.');
+            }
+
             $data = [
                 'fullName' => (string) $request->request->get('fullName', ''),
                 'email' => (string) $request->request->get('email', ''),
@@ -75,8 +83,8 @@ final readonly class ApplyController
                         $this->twig->render('application/apply_success.html.twig'),
                         Response::HTTP_OK,
                     );
-                } catch (\DomainException $e) {
-                    $errors['email'] = $e->getMessage();
+                } catch (DuplicateEmailException $e) {
+                    $errors['email'] = 'An application with this email already exists.';
                 }
             }
         }
