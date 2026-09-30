@@ -6,6 +6,7 @@ namespace App\Application\Infrastructure\Persistence;
 
 use App\Application\Domain\Model\JobApplication;
 use App\Application\Domain\Model\ValueObject\ApplicationId;
+use App\Application\Domain\Model\ValueObject\Email;
 use App\Application\Domain\Repository\JobApplicationRepository;
 
 final class InMemoryJobApplicationRepository implements JobApplicationRepository
@@ -25,10 +26,13 @@ final class InMemoryJobApplicationRepository implements JobApplicationRepository
 
     public function findAll(): array
     {
-        return array_values($this->applications);
+        $apps = array_values($this->applications);
+        usort($apps, static fn (JobApplication $a, JobApplication $b): int => $b->appliedAt <=> $a->appliedAt);
+
+        return $apps;
     }
 
-    public function findByEmail(\App\Application\Domain\Model\ValueObject\Email $email): ?JobApplication
+    public function findByEmail(Email $email): ?JobApplication
     {
         foreach ($this->applications as $application) {
             if ($application->email->value === $email->value) {
@@ -41,6 +45,34 @@ final class InMemoryJobApplicationRepository implements JobApplicationRepository
 
     public function findByCriteria(array $criteria): array
     {
-        return $this->findAll();
+        $apps = $this->findAll();
+
+        if ([] === $criteria || ('' === ($criteria['status'] ?? '') && '' === ($criteria['position'] ?? '') && '' === ($criteria['search'] ?? ''))) {
+            return $apps;
+        }
+
+        $filtered = [];
+        foreach ($apps as $app) {
+            if (isset($criteria['status']) && '' !== $criteria['status'] && $app->status->value !== $criteria['status']) {
+                continue;
+            }
+
+            if (isset($criteria['position']) && '' !== $criteria['position'] && $app->position->value !== $criteria['position']) {
+                continue;
+            }
+
+            if (isset($criteria['search']) && '' !== $criteria['search']) {
+                $search = strtolower($criteria['search']);
+                $match = str_contains(strtolower($app->fullName->value), $search)
+                    || str_contains(strtolower($app->email->value), $search);
+                if (!$match) {
+                    continue;
+                }
+            }
+
+            $filtered[] = $app;
+        }
+
+        return $filtered;
     }
 }
