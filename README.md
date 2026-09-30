@@ -38,6 +38,43 @@ src/
 - **Enrichment Requested** → Async Consumer (Ecotone + Symfony Messenger) → Mock LLM → Update Application
 - **List / Detail** → Query Bus → Repository → DTOs → Twig + LiveComponents
 
+### Enrichment Flow (Mermaid)
+
+```mermaid
+sequenceDiagram
+    actor U as Candidate
+    participant AC as ApplyController
+    participant CB as CommandBus
+    participant SH as SubmitApplicationHandler
+    participant JA as JobApplication
+    participant EB as EventBus
+    participant MS as Symfony Messenger
+    participant EC as EnrichmentHandler
+    participant LLM as MockLLMClient
+    participant DB as PostgreSQL
+
+    U->>AC: POST /apply (form data)
+    AC->>CB: SubmitApplication command
+    CB->>SH: Route to handler
+    SH->>JA: submit()
+    JA->>DB: INSERT (status = received)
+    JA->>EB: ApplicationSubmitted
+    JA->>EB: EnrichmentRequested
+    EB->>MS: Enqueue async message
+    AC->>U: 200 OK (Application Submitted)
+
+    MS->>EC: Consume EnrichmentRequested
+    EC->>LLM: enrich(cvText, position)
+    LLM-->>EC: { summary, score }
+    EC->>JA: updateWithEnrichment(summary, score)
+    JA->>DB: UPDATE (status = enriched)
+
+    U->>AC: GET /applications
+    AC->>DB: SELECT (newest first)
+    DB-->>AC: Applications + summaries + scores
+    AC->>U: Render list with scores
+```
+
 ## Getting Started
 
 ### Prerequisites
