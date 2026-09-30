@@ -20,6 +20,11 @@ abstract class DatabaseTestCase extends KernelTestCase
         /** @var EntityManagerInterface $em */
         $em = self::getContainer()->get(EntityManagerInterface::class);
         $this->em = $em;
+
+        // Ensure a clean state for each test, as DAMADoctrineTestBundle may leave
+        // data behind when the connection was established before PHPUnitExtension
+        // had a chance to enable StaticDriver.
+        $em->getConnection()->executeStatement('DELETE FROM job_applications');
     }
 
     protected function tearDown(): void
