@@ -75,8 +75,8 @@ final readonly class ApplyController
                         $this->twig->render('application/apply_success.html.twig'),
                         Response::HTTP_OK,
                     );
-                } catch (\InvalidArgumentException $e) {
-                    $errors['general'] = $e->getMessage();
+                } catch (\DomainException $e) {
+                    $errors['email'] = $e->getMessage();
                 }
             }
         }
