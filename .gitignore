@@ -28,3 +28,13 @@
 ###> deptrac ###
 .deptrac.cache
 ###< deptrac ###
+
+# Claude personal skills (not committed)
+/.claude/
+
+# Generated reference files
+/config/reference.php
+
+# Internal planning documents
+/docs/plans/
+/docs/superpowers/
