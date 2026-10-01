@@ -37,8 +37,6 @@
         "behat/behat": "^4.0",
         "dama/doctrine-test-bundle": "^8.4",
         "deptrac/deptrac": "^4.2",
-        "doctrine/doctrine-fixtures-bundle": "^4.3",
-        "ecotone/lite-application": "^1.327",
         "friends-of-behat/symfony-extension": "^2.7",
         "friendsofphp/php-cs-fixer": "^3.0",
         "phpstan/phpstan": "^2.0",
