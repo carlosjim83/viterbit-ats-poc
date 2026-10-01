@@ -11,6 +11,7 @@ init: up
 	docker compose exec php composer install --no-interaction --prefer-dist
 	docker compose exec php php bin/console doctrine:database:create --if-not-exists
 	docker compose exec php php bin/console doctrine:migrations:migrate --no-interaction
+	docker compose exec php php bin/console tailwind:build
 
 up:
 	docker compose up -d

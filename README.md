@@ -85,7 +85,8 @@ sequenceDiagram
 ### Run Locally
 
 ```bash
-make init          # Start containers, install deps, create DB, run migrations
+cp .env.example .env   # Copy environment template (never commit .env)
+make init              # Start containers, install deps, create DB, run migrations, build assets
 ```
 
 Then open: [http://localhost:8080/apply](http://localhost:8080/apply)
